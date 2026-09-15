@@ -1,769 +1,35 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import logo from "./assets/logo.png.png";
 import "./index.css";
+import { supabase } from "./supabaseClient";
 
 /* =========================================================
    IMAGES
 ========================================================= */
 
 const heroImage =
-  "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=85";
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Al%20Hoceima%20Beach.jpg?width=1400";
 
-const hotelImage =
-  "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=85";
-
-const beachImage =
-  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=85";
-
-const foodImage =
-  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85";
-
-const gamingImage =
-  "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1000&q=85";
-
-/* =========================================================
-   DATA - HOTELS AL HOCEIMA
-========================================================= */
-
-const hotels = [
-  {
-    id: 1,
-    name: "Hôtel Mercure Quemado Resort",
-    stars: 4,
-    rating: 4.4,
-    reviews: 4194,
-    location: "Quemado, Al Hoceima",
-    address: "Av. Mohamed V, Al Hoceima 32000",
-    price: 1109,
-    phone: "+212539842200",
-    hours: "24h/24",
-    coordinates: "35.2459,-3.9305",
-    description:
-      "Hôtel situé à proximité de la plage Quemado à Al Hoceima, idéal pour profiter de la mer et découvrir la ville.",
-    rooms: [],
-    services: [
-      "Wi-Fi gratuit",
-      "Piscine",
-      "Restaurant",
-      "Parking",
-      "Climatisation",
-      "Réception 24h/24",
-    ],
-  },
-
-  {
-    id: 2,
-    name: "Hôtel Mira Palace",
-    stars: 4,
-    rating: 3.9,
-    reviews: 256,
-    location: "Mirador, Al Hoceima",
-    address: "Hay Mirador, Espace Mirador, Al Hoceima 32000",
-    price: 1342,
-    phone: "+212539840084",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hôtel élégant situé face à la baie d'Al Hoceima avec suites, piscine et rooftop panoramique.",
-    rooms: [
-      {
-        name: "Chambre Premium",
-        price: 1342,
-        icon: "🛏️",
-      },
-      {
-        name: "Suite",
-        price: 1600,
-        icon: "🛋️",
-      },
-    ],
-    services: [
-      "Wi-Fi gratuit",
-      "Piscine",
-      "Restaurant",
-      "Rooftop",
-      "Climatisation",
-      "Réception 24h/24",
-    ],
-  },
-
-  {
-    id: 3,
-    name: "Radisson Blu Resort Al Hoceima",
-    stars: 5,
-    rating: 3.8,
-    reviews: 1417,
-    location: "Plage Sfiha",
-    address: "KM 8, Plage Sfiha, Ajdir 35502",
-    price: 1480,
-    phone: "+212539844000",
-    hours: "24h/24",
-    coordinates: "35.1780,-3.9080",
-    description:
-      "Resort 5 étoiles en bord de mer, situé près de la plage Sfiha, avec piscine, spa et nombreuses activités.",
-    rooms: [],
-    services: [
-      "Wi-Fi gratuit",
-      "Piscine extérieure",
-      "Plage",
-      "Restaurant",
-      "Spa",
-      "Fitness",
-      "Parking",
-      "Club enfants",
-    ],
-  },
-
-  {
-    id: 4,
-    name: "Radisson Blu Residences Al Hoceima",
-    stars: 5,
-    rating: 3.9,
-    reviews: 351,
-    location: "Plage Sfiha",
-    address: "Plage Sfiha KM 7, Ajdir",
-    price: 1268,
-    phone: "+212539844400",
-    hours: "24h/24",
-    coordinates: "35.1780,-3.9080",
-    description:
-      "Résidence en bord de mer proposant des chalets et bungalows près de la plage Sfiha.",
-    rooms: [],
-    services: [
-      "Wi-Fi gratuit",
-      "Plage",
-      "Piscine",
-      "Parking",
-      "Jardin",
-      "Terrasse",
-      "Climatisation",
-    ],
-  },
-
-  {
-    id: 5,
-    name: "Hôtel Al Hoceima Bay",
-    stars: 4,
-    rating: 3.6,
-    reviews: 881,
-    location: "Plage Sfiha",
-    address: "Plage Sfiha, Ajdir, Al Hoceima",
-    price: 891,
-    phone: "+212539802011",
-    hours: "24h/24",
-    coordinates: "35.1780,-3.9080",
-    description:
-      "Hôtel situé dans la zone de Sfiha, près de la plage, adapté aux séjours en famille.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Piscine",
-      "Restaurant",
-      "Parking",
-      "Plage",
-      "Climatisation",
-    ],
-  },
-
-  {
-    id: 6,
-    name: "Hôtel Golden Bay",
-    stars: 4,
-    rating: 3.5,
-    reviews: 76,
-    location: "Al Hoceima",
-    address: "Al Hoceima, Maroc",
-    price: 1220,
-    phone: "+212539842777",
-    hours: "24h/24",
-    coordinates: "35.2470,-3.9320",
-    description:
-      "Hôtel situé à Al Hoceima avec restaurant, terrasse et accès à la plage.",
-    rooms: [],
-    services: [
-      "Plage",
-      "Restaurant",
-      "Terrasse",
-      "Parking",
-      "Wi-Fi",
-      "Climatisation",
-    ],
-  },
-
-  {
-    id: 7,
-    name: "Appart Hôtel Puerto Marino",
-    stars: 3,
-    rating: 3.5,
-    reviews: 196,
-    location: "Centre-ville",
-    address: "28 Rue Anoual, Al Hoceima 32000",
-    price: 1212,
-    phone: "+212600333319",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9360",
-    description:
-      "Appart-hôtel situé au centre d'Al Hoceima, adapté aux voyageurs recherchant davantage d'autonomie.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Appartements",
-      "Climatisation",
-      "Parking",
-      "Réception",
-    ],
-  },
-
-  {
-    id: 8,
-    name: "RS Appartements Hôtel",
-    stars: 3,
-    rating: 4.5,
-    reviews: 24,
-    location: "Mirador Bas",
-    address: "Rue Oulmess, Mirador Bas, Al Hoceima",
-    price: 1450,
-    phone: "+212778939731",
-    hours: "24h/24",
-    coordinates: "35.2530,-3.9390",
-    description:
-      "Appartements situés dans le quartier Mirador Bas à Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Appartements",
-      "Climatisation",
-      "Parking",
-    ],
-  },
-
-  {
-    id: 9,
-    name: "Hôtel La Marina",
-    stars: 2,
-    rating: 3.3,
-    reviews: 160,
-    location: "Hay Calabonita",
-    address: "Hay Calabonita, Al Hoceima",
-    price: 286,
-    phone: "+212539840189",
-    hours: "24h/24",
-    coordinates: "35.2450,-3.9270",
-    description:
-      "Hôtel situé dans le quartier Calabonita à Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Restaurant",
-      "Parking",
-      "Climatisation",
-      "Réception",
-    ],
-  },
-
-  {
-    id: 10,
-    name: "Hôtel La Perla",
-    stars: 3,
-    rating: 3.5,
-    reviews: 871,
-    location: "Centre-ville",
-    address: "Bd Tarik Ibn Ziyad, Al Hoceima 32000",
-    price: 692,
-    phone: "+212539984513",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hôtel situé au centre d'Al Hoceima, près de la plage Quemado, avec restaurant panoramique.",
-    rooms: [],
-    services: [
-      "Wi-Fi gratuit",
-      "Restaurant",
-      "Réception 24h/24",
-      "Climatisation",
-      "Service de chambre",
-      "Vue panoramique",
-    ],
-  },
-
-  {
-    id: 11,
-    name: "Hôtel Cataleya",
-    stars: 3,
-    rating: 4.1,
-    reviews: 112,
-    location: "Corniche de Sabadia",
-    address: "Corniche de Sabadia, Al Hoceima 32000",
-    price: 800,
-    phone: "+212662100590",
-    hours: "24h/24",
-    coordinates: "35.2505,-3.9328",
-    description:
-      "Hôtel situé sur la corniche maritime de Sabadia.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Climatisation",
-      "Parking",
-      "Réception",
-      "Terrasse",
-    ],
-  },
-
-  {
-    id: 12,
-    name: "Hôtel National",
-    stars: 2,
-    rating: 3.4,
-    reviews: 135,
-    location: "Centre-ville",
-    address: "23 Rue Tetouane, Al Hoceima 32000",
-    price: 233,
-    phone: "+212539982681",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hôtel économique situé au centre-ville d'Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi gratuit",
-      "Réception 24h/24",
-      "Service de chambre",
-    ],
-  },
-
-  {
-    id: 13,
-    name: "Hôtel Nexus Budget",
-    stars: 2,
-    rating: 3.6,
-    reviews: 68,
-    location: "Avenue Mohamed V",
-    address:
-      "Avenue Mohamed V, 4 Passage Soussan, Al Hoceima",
-    price: 180,
-    phone: "+212539840147",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hébergement économique situé au centre d'Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Réception",
-      "Climatisation",
-    ],
-  },
-
-  {
-    id: 14,
-    name: "Suites Hotel Mohammed V by Accor",
-    stars: 4,
-    rating: 4.0,
-    reviews: 108,
-    location: "Place Mohammed VI",
-    address: "Place Mohammed VI, Al Hoceima",
-    price: 0,
-    phone: "+212539982233",
-    hours: "24h/24",
-    coordinates: "35.2490,-3.9370",
-    description:
-      "Hôtel situé sur la Place Mohammed VI à Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Restaurant",
-      "Climatisation",
-      "Réception",
-      "Parking",
-    ],
-  },
-
-  {
-    id: 15,
-    name: "Hôtel Amir Plage",
-    stars: 3,
-    rating: 3.4,
-    reviews: 251,
-    location: "Al Hoceima",
-    address: "Al Hoceima, Maroc",
-    price: 0,
-    phone: "+212539983290",
-    hours: "24h/24",
-    coordinates: "35.2470,-3.9340",
-    description:
-      "Hôtel situé à Al Hoceima, à proximité des différents points d'intérêt de la ville.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Climatisation",
-      "Réception",
-      "Parking",
-    ],
-  },
-
-  {
-    id: 16,
-    name: "Hôtel Villa Florido",
-    stars: 3,
-    rating: 3.7,
-    reviews: 287,
-    location: "Centre-ville",
-    address: "32000, Al Hoceima",
-    price: 0,
-    phone: "+212539840847",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hôtel situé au centre d'Al Hoceima, anciennement connu sous le nom Hôtel Étoile du Rif.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Réception",
-      "Climatisation",
-      "Restaurant",
-    ],
-  },
-
-  {
-    id: 17,
-    name: "Hôtel Al Khouzama",
-    stars: 3,
-    rating: 3.3,
-    reviews: 128,
-    location: "Al Hoceima",
-    address: "Al Hoceima, Maroc",
-    price: 0,
-    phone: "",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hôtel situé à Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Climatisation",
-      "Réception",
-    ],
-  },
-
-  {
-    id: 18,
-    name: "Résidence El Nido",
-    stars: 3,
-    rating: 4.6,
-    reviews: 17,
-    location: "Al Hoceima",
-    address: "Al Hoceima 32000",
-    price: 0,
-    phone: "+212684258844",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Résidence située dans la région d'Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Parking",
-      "Climatisation",
-    ],
-  },
-
-  {
-    id: 19,
-    name: "Hôtel La Perla Bleue",
-    stars: 3,
-    rating: 3.6,
-    reviews: 85,
-    location: "Hay Calabonita",
-    address: "Hay Calabonita, Al Hoceima 32000",
-    price: 0,
-    phone: "+212539982539",
-    hours: "24h/24",
-    coordinates: "35.2450,-3.9270",
-    description:
-      "Hôtel situé dans le quartier Calabonita à Al Hoceima.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Climatisation",
-      "Réception",
-    ],
-  },
-
-  {
-    id: 20,
-    name: "Hôtel Basilic",
-    stars: 3,
-    rating: 3.5,
-    reviews: 724,
-    location: "Al Hoceima",
-    address:
-      "131 Avenue Abdelkrim El Khattabi, Al Hoceima",
-    price: 0,
-    phone: "+212539980083",
-    hours: "24h/24",
-    coordinates: "35.2500,-3.9370",
-    description:
-      "Hôtel situé à Al Hoceima avec des services adaptés aux voyageurs.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Réception",
-      "Climatisation",
-      "Parking",
-    ],
-  },
-
-  {
-    id: 21,
-    name: "Chafarina's Beach Hotel",
-    stars: 3,
-    rating: 3.5,
-    reviews: 176,
-    location: "Tala Youssef",
-    address: "Tala Youssef, Al Hoceima",
-    price: 0,
-    phone: "+212808518378",
-    hours: "24h/24",
-    coordinates: "35.2260,-3.9630",
-    description:
-      "Hôtel situé dans la zone de Tala Youssef près du littoral.",
-    rooms: [],
-    services: [
-      "Wi-Fi",
-      "Parking",
-      "Climatisation",
-      "Réception",
-    ],
-  },
-];
-
-/* =========================================================
-   DATA - RESTAURANTS
-========================================================= */
-
-const restaurants = [
-  {
-    id: 1,
-    name: "Break Alhoceima",
-    rating: 4.3,
-    reviews: 493,
-    cuisine: ["Italienne", "Pizza", "Fast Food"],
-    price: "50–100 DH",
-    location: "Al Hoceima",
-    address: "25 Av. Hassan II, Al Hoceima",
-    phone: "+212539841311",
-    hours: "12h00 - 01h30",
-    coordinates: "35.2512,-3.9375",
-    description:
-      "Restaurant proposant notamment des pizzas, plats italiens et options de restauration rapide.",
-    services: [
-      "Wi-Fi gratuit",
-      "Terrasse",
-      "À emporter",
-      "Réservation",
-      "Paiement par carte",
-      "Service à table",
-    ],
-  },
-  {
-    id: 2,
-    name: "il Gusto",
-    rating: 4.1,
-    reviews: 268,
-    cuisine: ["Italienne"],
-    price: "50–150 DH",
-    location: "Al Hoceima",
-    address: "18 Rue 9 Juillet, Al Hoceima",
-    phone: "+212667595746",
-    hours: "13h00 - 00h30",
-    coordinates: "35.2507,-3.9369",
-    description:
-      "Une adresse italienne au cœur d'Al Hoceima.",
-    services: [
-      "Service à table",
-      "À emporter",
-      "Réservation",
-      "Paiement par carte",
-    ],
-  },
-  {
-    id: 3,
-    name: "Niebla Marina",
-    rating: 3.4,
-    reviews: 171,
-    cuisine: [
-      "Marocaine",
-      "Fruits de mer",
-      "Méditerranéenne",
-      "Grillades",
-    ],
-    price: "100–250 DH",
-    location: "Marina, Al Hoceima",
-    address: "Marina, Al Hoceima",
-    phone: "+212808646614",
-    hours: "11h00 - 02h00",
-    coordinates: "35.2478,-3.9305",
-    description:
-      "Restaurant situé dans la zone de la marina.",
-    services: [
-      "Vue sur la marina",
-      "Terrasse",
-      "Parking",
-      "Livraison",
-      "À emporter",
-      "Réservation",
-      "Wi-Fi",
-    ],
-  },
-  {
-    id: 4,
-    name: "T Hoekje Restaurant",
-    rating: 3.2,
-    reviews: 321,
-    cuisine: ["Restaurant", "Cuisine variée"],
-    price: "100–350 DH",
-    location: "Corniche de Sabadia",
-    address:
-      "Rue Tarik, Corniche de Sabadia, Al Hoceima",
-    phone: "+212613178622",
-    hours: "09h00 - 02h00",
-    coordinates: "35.2505,-3.9328",
-    description:
-      "Restaurant situé près de la corniche maritime de Sabadia.",
-    services: [
-      "Terrasse",
-      "Service à table",
-      "Réservation",
-      "À emporter",
-    ],
-  },
-  {
-    id: 5,
-    name: "Casa Bento",
-    rating: 4.1,
-    reviews: 291,
-    cuisine: [
-      "Italienne",
-      "Mexicaine",
-      "Japonaise",
-      "Marocaine",
-    ],
-    price: "50–150 DH",
-    location: "Al Hoceima",
-    address:
-      "58 Bd Tarik Ibn Ziyad, Al Hoceima",
-    phone: "+212605839594",
-    hours: "07h00 - 01h00",
-    coordinates: "35.2520,-3.9350",
-    description:
-      "Une adresse proposant une cuisine variée.",
-    services: [
-      "Petit-déjeuner",
-      "Livraison",
-      "À emporter",
-      "Terrasse",
-      "Réservation",
-      "Wi-Fi",
-    ],
-  },
-  {
-    id: 6,
-    name: "BARBECUE BROTHER'S",
-    rating: 4.9,
-    reviews: 383,
-    cuisine: ["Grillades", "Barbecue"],
-    price: "1–50 DH",
-    location: "Sidi Abid",
-    address: "Av. Sidi Abid, Al Hoceima",
-    phone: "+212623573845",
-    hours: "12h00 - 03h00",
-    coordinates: "35.2449,-3.9440",
-    description:
-      "Une adresse spécialisée dans les grillades et le barbecue.",
-    services: [
-      "Livraison",
-      "À emporter",
-      "Parking",
-      "Terrasse",
-      "Service à table",
-    ],
-  },
-];
-
-/* =========================================================
-   DATA - GAMING
-========================================================= */
-
-const gamingPlaces = [
-  {
-    id: 1,
-    name: "Gaming House Al Hoceima",
-    rating: 4.6,
-    reviews: 84,
-    type: ["PS5", "PC Gaming", "Esport"],
-    price: "10–30 DH / heure",
-    location: "Centre-ville",
-    address: "Centre-ville, Al Hoceima",
-    phone: "+212600000001",
-    hours: "14h00 - 02h00",
-    coordinates: "35.2504,-3.9365",
-    description:
-      "Espace gaming pour jouer entre amis sur PC et consoles, avec une ambiance dédiée aux joueurs.",
-    services: [
-      "PC Gaming",
-      "PS5",
-      "Esport",
-      "Wi-Fi",
-      "Tournois",
-      "Snacks",
-    ],
-  },
-  {
-    id: 2,
-    name: "Hoceima Esports Arena",
-    rating: 4.5,
-    reviews: 61,
-    type: ["PC Gaming", "Esport", "Compétition"],
-    price: "15–40 DH / heure",
-    location: "Al Hoceima",
-    address: "Al Hoceima, Maroc",
-    phone: "+212600000002",
-    hours: "15h00 - 01h00",
-    coordinates: "35.2520,-3.9380",
-    description:
-      "Un espace consacré au gaming compétitif et aux jeux vidéo entre amis.",
-    services: [
-      "PC Gaming",
-      "Esport",
-      "Tournois",
-      "Wi-Fi",
-      "Casques Gaming",
-    ],
-  },
-  {
-    id: 3,
-    name: "PlayZone Hoceima",
-    rating: 4.3,
-    reviews: 47,
-    type: ["PS5", "FIFA", "Jeux vidéo"],
-    price: "10–25 DH / heure",
-    location: "Al Hoceima",
-    address: "Al Hoceima, Maroc",
-    phone: "+212600000003",
-    hours: "12h00 - 00h00",
-    coordinates: "35.2488,-3.9390",
-    description:
-      "Un espace gaming convivial pour jouer à FIFA, jeux de sport et autres jeux vidéo.",
-    services: [
-      "PS5",
-      "FIFA",
-      "Jeux vidéo",
-      "Wi-Fi",
-      "Tournois",
-    ],
-  },
-];
+const fallbackImages = {
+  hotels:
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80",
+  restaurants:
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80",
+  pharmacies:
+    "https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=1000&q=80",
+  cafes:
+    "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=80",
+  beauty:
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=80",
+  gaming:
+    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1000&q=80",
+  shopping:
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80",
+  activities:
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
+  transport:
+    "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1000&q=80",
+};
 
 /* =========================================================
    CATEGORIES
@@ -781,9 +47,56 @@ const categories = [
   { id: "transport", icon: "↗", name: "Transport" },
 ];
 
+const emptyData = {
+  hotels: [],
+  restaurants: [],
+  pharmacies: [],
+  cafes: [],
+  beauty: [],
+  gaming: [],
+  shopping: [],
+  activities: [],
+  transport: [],
+};
+
 /* =========================================================
    HELPERS
 ========================================================= */
+
+function getCategoryName(type) {
+  return (
+    categories.find((category) => category.id === type)?.name ||
+    "Lieu"
+  );
+}
+
+function getImage(item, type) {
+  return (
+    item.main_image_url ||
+    item.image ||
+    item.image_url ||
+    item.photo ||
+    item.cover ||
+    fallbackImages[type] ||
+    heroImage
+  );
+}
+
+function mapsUrl(item) {
+  if (item.google_maps) return item.google_maps;
+
+  if (item.maps_url) return item.maps_url;
+
+  if (item.latitude && item.longitude) {
+    return `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`;
+  }
+
+  const query = encodeURIComponent(
+    `${item.name || ""} ${item.address || ""} Al Hoceima`
+  );
+
+  return `https://www.google.com/maps/search/?api=1&query=${query}`;
+}
 
 function scrollTop() {
   window.scrollTo({
@@ -792,10 +105,204 @@ function scrollTop() {
   });
 }
 
-function mapsUrl(coordinates) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    coordinates
-  )}`;
+/* =========================================================
+   AUTH MODAL
+========================================================= */
+
+function AuthModal({ onClose, onUserChange }) {
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      if (!email || !password) {
+        setMessage("Veuillez remplir tous les champs.");
+        return;
+      }
+
+      if (mode === "login") {
+        const { data, error } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+        if (error) throw error;
+
+        onUserChange?.(data.user);
+        onClose();
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        onUserChange?.(data.user);
+
+        setMessage(
+          "Compte créé. Vérifiez votre email si une confirmation est demandée."
+        );
+      }
+    } catch (error) {
+      setMessage(error.message || "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "rgba(10,30,40,.55)",
+        display: "grid",
+        placeItems: "center",
+        padding: 20,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          background: "#fff",
+          borderRadius: 22,
+          padding: 28,
+          boxShadow: "0 25px 80px rgba(0,0,0,.2)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <div>
+            <span className="page-kicker">VILLAMAP</span>
+
+            <h2>
+              {mode === "login"
+                ? "Bienvenue 👋"
+                : "Créer un compte"}
+            </h2>
+          </div>
+
+          <button
+            onClick={onClose}
+            style={{
+              border: 0,
+              background: "#f2f7f9",
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              fontSize: 20,
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "grid",
+            gap: 12,
+          }}
+        >
+          <input
+            type="email"
+            placeholder="Votre email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{
+              padding: "13px 14px",
+              border: "1px solid #e2edf2",
+              borderRadius: 11,
+              outline: "none",
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              padding: "13px 14px",
+              border: "1px solid #e2edf2",
+              borderRadius: 11,
+              outline: "none",
+            }}
+          />
+
+          {message && (
+            <p
+              style={{
+                fontSize: 13,
+                color: "#d45b5b",
+              }}
+            >
+              {message}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              border: 0,
+              background: "#1499dc",
+              color: "#fff",
+              padding: "13px",
+              borderRadius: 11,
+              fontWeight: 800,
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            {loading
+              ? "Chargement..."
+              : mode === "login"
+              ? "Se connecter"
+              : "Créer mon compte"}
+          </button>
+        </form>
+
+        <button
+          onClick={() => {
+            setMode(mode === "login" ? "signup" : "login");
+            setMessage("");
+          }}
+          style={{
+            width: "100%",
+            border: 0,
+            background: "none",
+            color: "#1499dc",
+            marginTop: 18,
+            fontWeight: 700,
+          }}
+        >
+          {mode === "login"
+            ? "Créer un nouveau compte"
+            : "J'ai déjà un compte"}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /* =========================================================
@@ -803,14 +310,26 @@ function mapsUrl(coordinates) {
 ========================================================= */
 
 function Navbar({
+  search,
+  setSearch,
   menuOpen,
   setMenuOpen,
-  goHome,
-  openCategory,
+  onHome,
+  onExplorer,
+  onCategory,
+  user,
+  onAuth,
+  isAdmin,
+  onAdmin,
 }) {
-  function closeAnd(action) {
-    action();
+  async function logout() {
+    await supabase.auth.signOut();
+  }
+
+  function go(action) {
     setMenuOpen(false);
+    action();
+    scrollTop();
   }
 
   return (
@@ -818,76 +337,56 @@ function Navbar({
       <div className="navbar-inner">
         <button
           className="logo"
-          type="button"
-          onClick={() => closeAnd(goHome)}
+          onClick={() => go(onHome)}
         >
-          <span className="logo-mark">⌖</span>
-          <span>
-            Villa<span>Map</span>
-          </span>
+          <img src={logo} alt="VillaMap" className="logo-image" />
         </button>
 
-        <nav className={menuOpen ? "menu menu-open" : "menu"}>
-          <button
-            type="button"
-            onClick={() => closeAnd(goHome)}
-          >
+        <nav
+          className={`menu ${
+            menuOpen ? "menu-open" : ""
+          }`}
+        >
+          <button onClick={() => go(onHome)}>
             Accueil
           </button>
 
-          <button
-            type="button"
-            onClick={() =>
-              closeAnd(() => openCategory("restaurants"))
-            }
-          >
+          <button onClick={() => go(onExplorer)}>
             Explorer
           </button>
 
           <button
-            type="button"
             onClick={() =>
-              closeAnd(() => openCategory("hotels"))
+              go(() => onCategory("hotels"))
             }
           >
             Hôtels
           </button>
 
           <button
-            type="button"
             onClick={() =>
-              closeAnd(() => openCategory("restaurants"))
+              go(() => onCategory("restaurants"))
             }
           >
             Restaurants
           </button>
 
           <button
-            type="button"
             onClick={() =>
-              closeAnd(() => openCategory("gaming"))
+              go(() => onCategory("gaming"))
             }
           >
             Gaming
           </button>
 
           <button
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              goHome();
-
-              setTimeout(() => {
-                const about =
-                  document.getElementById("about");
-
-                if (about) {
-                  about.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }
-              }, 250);
-            }}
+            onClick={() =>
+              document
+                .getElementById("about")
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                })
+            }
           >
             À propos
           </button>
@@ -896,13 +395,46 @@ function Navbar({
         <div className="nav-location">
           ⌖ Al Hoceima
         </div>
+{isAdmin && (
+  <button
+    onClick={() => {
+      setMenuOpen(false);
+      onAdmin();
+      scrollTop();
+    }}
+    style={{
+      border: 0,
+      background: "#163246",
+      color: "#fff",
+      borderRadius: 11,
+      padding: "9px 13px",
+      fontWeight: 750,
+      fontSize: 12,
+      cursor: "pointer",
+    }}
+  >
+    📸 Admin
+  </button>
+)}
+        <button
+          onClick={user ? logout : onAuth}
+          style={{
+            border: 0,
+            background: "#eaf7fd",
+            color: "#087bb7",
+            borderRadius: 11,
+            padding: "9px 13px",
+            fontWeight: 750,
+            fontSize: 12,
+          }}
+        >
+          {user ? "Déconnexion" : "Connexion"}
+        </button>
 
         <button
           className="mobile-button"
-          type="button"
-          onClick={() =>
-            setMenuOpen((value) => !value)
-          }
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Menu"
         >
           {menuOpen ? "×" : "☰"}
         </button>
@@ -912,85 +444,101 @@ function Navbar({
 }
 
 /* =========================================================
-   SEARCH
+   SEARCH BOX
 ========================================================= */
 
-function SearchBox({ value, onChange, full = false }) {
+function SearchBox({
+  value,
+  onChange,
+  onSubmit,
+  full = false,
+}) {
   return (
-    <div
+    <form
       className={`search-box-modern ${
         full ? "full" : ""
       }`}
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit?.();
+      }}
     >
       <span>⌕</span>
 
       <input
-        type="search"
         value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder="Que cherchez-vous ?"
-        onChange={(event) =>
-          onChange(event.target.value)
-        }
       />
 
-      <button
-        type="button"
-        onClick={() =>
-          onChange(value.trim())
-        }
-      >
+      <button type="submit">
         Rechercher
       </button>
-    </div>
+    </form>
   );
 }
 
 /* =========================================================
-   CATEGORIES
+   CATEGORY GRID
 ========================================================= */
 
-function CategoryGrid({ openCategory }) {
+function CategoryGrid({ onCategory, data }) {
   return (
     <div className="category-grid-modern">
-      {categories.map((category) => (
-        <button
-          key={category.id}
-          className="category-tile"
-          type="button"
-          onClick={() =>
-            openCategory(category.id)
-          }
-        >
-          <span className="category-icon">
-            {category.icon}
-          </span>
+      {categories.map((category) => {
+        const count = data?.[category.id]?.length || 0;
 
-          <span>{category.name}</span>
+        return (
+          <button
+            className="category-tile"
+            key={category.id}
+            onClick={() => {
+              onCategory(category.id);
+              scrollTop();
+            }}
+          >
+            <span className="category-icon">
+              {category.icon}
+            </span>
 
-          <b>→</b>
-        </button>
-      ))}
+            <span>{category.name}</span>
+
+            <b>{count}</b>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
 /* =========================================================
-   FAVORITE
+   FAVORITES
 ========================================================= */
 
-function FavoriteButton() {
-  const [favorite, setFavorite] = useState(false);
+function FavoriteButton({ item, type }) {
+  const key = `villamap-favorite-${type}-${item.id}`;
+
+  const [favorite, setFavorite] = useState(
+    () => localStorage.getItem(key) === "true"
+  );
+
+  function toggle(e) {
+    e.stopPropagation();
+
+    const next = !favorite;
+
+    setFavorite(next);
+
+    localStorage.setItem(key, String(next));
+  }
 
   return (
     <button
       className={`heart ${
         favorite ? "favorite" : ""
       }`}
-      type="button"
-      onClick={(event) => {
-        event.stopPropagation();
-        setFavorite((value) => !value);
-      }}
+      onClick={toggle}
+      aria-label="Favori"
     >
       {favorite ? "♥" : "♡"}
     </button>
@@ -998,115 +546,95 @@ function FavoriteButton() {
 }
 
 /* =========================================================
-   RESTAURANT CARD
+   PLACE CARD
 ========================================================= */
 
-function RestaurantCard({
-  restaurant,
-  openRestaurant,
+function PlaceCard({
+  item,
+  type,
+  onClick,
 }) {
+  const rating = Number(item.rating || 0);
+
   return (
     <article
       className="listing-card"
-      onClick={() =>
-        openRestaurant(restaurant)
-      }
+      onClick={() => {
+        onClick(item, type);
+        scrollTop();
+      }}
     >
       <div
         className="listing-photo"
         style={{
-          backgroundImage: `url("${foodImage}")`,
+          backgroundImage: `url("${getImage(
+            item,
+            type
+          )}")`,
         }}
       >
         <span className="rating-pill">
-          ★ {restaurant.rating}
+          ⭐ {rating ? rating.toFixed(1) : "N/A"}
         </span>
 
-        <FavoriteButton />
+        <FavoriteButton
+          item={item}
+          type={type}
+        />
       </div>
 
       <div className="listing-body">
-        <div className="eyebrow">
-          Restaurant
-        </div>
-
-        <h3>{restaurant.name}</h3>
-
-        <p className="muted">
-          📍 {restaurant.location} ·{" "}
-          {restaurant.price}
-        </p>
-
-        <div className="tags">
-          {restaurant.cuisine
-            .slice(0, 3)
-            .map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-        </div>
-
-        <div className="card-bottom">
-          <small>
-            ★ {restaurant.rating} ·{" "}
-            {restaurant.reviews} avis
-          </small>
-
-          <b>Voir →</b>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/* =========================================================
-   HOTEL CARD
-========================================================= */
-
-function HotelCard({ hotel, openHotel }) {
-  return (
-    <article
-      className="listing-card"
-      onClick={() => openHotel(hotel)}
-    >
-      <div
-        className="listing-photo"
-        style={{
-          backgroundImage: `url("${hotelImage}")`,
-        }}
-      >
-        <span className="rating-pill">
-          ★ {hotel.rating}
+        <span className="eyebrow">
+          {getCategoryName(type)}
         </span>
 
-        <FavoriteButton />
-      </div>
-
-      <div className="listing-body">
-        <div className="eyebrow">
-          Hôtel · {hotel.stars} étoiles
-        </div>
-
-        <h3>{hotel.name}</h3>
+        <h3>
+          {item.name || "Lieu sans nom"}
+        </h3>
 
         <p className="muted">
-          📍 {hotel.location}
+          📍{" "}
+          {item.address ||
+            "Al Hoceima, Maroc"}
         </p>
 
-        <div className="card-bottom">
-          <small>
-            ★ {hotel.rating} ·{" "}
-            {hotel.reviews} avis
-          </small>
+        {item.description && (
+          <p
+            className="muted"
+            style={{
+              marginTop: 6,
+            }}
+          >
+            {item.description.length > 90
+              ? `${item.description.slice(
+                  0,
+                  90
+                )}...`
+              : item.description}
+          </p>
+        )}
 
-          {hotel.price > 0 ? (
-            <strong>
-              À partir de {hotel.price} DH
-            </strong>
-          ) : (
-            <strong>
-              Voir les tarifs
-            </strong>
+        {Array.isArray(item.services) &&
+          item.services.length > 0 && (
+            <div className="tags">
+              {item.services
+                .slice(0, 3)
+                .map((service, index) => (
+                  <span key={index}>
+                    {service}
+                  </span>
+                ))}
+            </div>
           )}
+
+        <div className="card-bottom">
+          <span>
+            {item.reviews || 0} avis
+          </span>
+
+          <b>
+            Voir détails →
+          </b>
         </div>
       </div>
     </article>
@@ -1114,58 +642,549 @@ function HotelCard({ hotel, openHotel }) {
 }
 
 /* =========================================================
-   GAMING CARD
+   REVIEWS
 ========================================================= */
 
-function GamingCard({ gaming, openGaming }) {
+function ReviewsSection({
+  item,
+  type,
+  user,
+  onAuth,
+}) {
+  const placeId = `${type}-${item.id}`;
+
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function loadReviews() {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select(
+        "id, place_id, user_id, rating, comment, created_at"
+      )
+      .eq("place_id", placeId)
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (!error) {
+      setReviews(data || []);
+    }
+  }
+
+  useEffect(() => {
+    loadReviews();
+  }, [placeId]);
+
+  async function submitReview(e) {
+    e.preventDefault();
+
+    if (!user) {
+      onAuth();
+      return;
+    }
+
+    if (user.is_anonymous) {
+      onAuth();
+      return;
+    }
+
+    if (!comment.trim()) return;
+
+    setLoading(true);
+
+    const { error } = await supabase
+      .from("reviews")
+      .insert({
+        place_id: placeId,
+        user_id: user.id,
+        rating,
+        comment: comment.trim(),
+      });
+
+    if (!error) {
+      setComment("");
+      setRating(5);
+      await loadReviews();
+    } else {
+      alert(error.message);
+    }
+
+    setLoading(false);
+  }
+
+  const average =
+    reviews.length > 0
+      ? reviews.reduce(
+          (sum, review) =>
+            sum + Number(review.rating || 0),
+          0
+        ) / reviews.length
+      : 0;
+
   return (
-    <article
-      className="listing-card"
-      onClick={() => openGaming(gaming)}
-    >
+    <section className="detail-card-modern">
+      <h2>
+        Avis des visiteurs
+      </h2>
+
       <div
-        className="listing-photo"
         style={{
-          backgroundImage: `url("${gamingImage}")`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          marginBottom: 20,
         }}
       >
-        <span className="rating-pill">
-          ★ {gaming.rating}
+        <strong
+          style={{
+            fontSize: 28,
+            color: "#1499dc",
+          }}
+        >
+          {average
+            ? average.toFixed(1)
+            : "—"}
+        </strong>
+
+        <span
+          style={{
+            color: "#f2aa20",
+            letterSpacing: 2,
+          }}
+        >
+          {"★".repeat(
+            Math.round(average || 0)
+          )}
+          {"☆".repeat(
+            Math.max(
+              0,
+              5 -
+                Math.round(
+                  average || 0
+                )
+            )
+          )}
         </span>
 
-        <FavoriteButton />
+        <small className="muted">
+          ({reviews.length} avis)
+        </small>
       </div>
 
-      <div className="listing-body">
-        <div className="eyebrow">
-          🎮 Gaming
-        </div>
-
-        <h3>{gaming.name}</h3>
-
-        <p className="muted">
-          📍 {gaming.location} ·{" "}
-          {gaming.price}
+      {reviews.length === 0 ? (
+        <p
+          className="muted"
+          style={{
+            marginBottom: 20,
+          }}
+        >
+          Aucun avis pour le moment.
+          Soyez le premier à donner votre
+          avis !
         </p>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gap: 12,
+            marginBottom: 24,
+          }}
+        >
+          {reviews.map((review) => (
+            <div
+              key={review.id}
+              style={{
+                borderTop:
+                  "1px solid #e2edf2",
+                paddingTop: 14,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  gap: 10,
+                }}
+              >
+                <strong>
+                  ⭐{" "}
+                  {Number(
+                    review.rating
+                  ).toFixed(0)}
+                  /5
+                </strong>
 
-        <div className="tags">
-          {gaming.type
-            .slice(0, 3)
-            .map((item) => (
-              <span key={item}>{item}</span>
-            ))}
+                <small className="muted">
+                  {review.created_at
+                    ? new Date(
+                        review.created_at
+                      ).toLocaleDateString(
+                        "fr-FR"
+                      )
+                    : ""}
+                </small>
+              </div>
+
+              <p
+                style={{
+                  marginTop: 5,
+                }}
+              >
+                {review.comment}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form
+        onSubmit={submitReview}
+        style={{
+          display: "grid",
+          gap: 10,
+        }}
+      >
+        <div>
+          <label
+            style={{
+              display: "block",
+              fontSize: 12,
+              color: "#728492",
+              marginBottom: 6,
+            }}
+          >
+            Votre note
+          </label>
+
+          <select
+            value={rating}
+            onChange={(e) =>
+              setRating(
+                Number(e.target.value)
+              )
+            }
+            style={{
+              padding: "10px",
+              border:
+                "1px solid #e2edf2",
+              borderRadius: 10,
+              background: "#fff",
+            }}
+          >
+            <option value={5}>
+              ⭐⭐⭐⭐⭐ — 5
+            </option>
+
+            <option value={4}>
+              ⭐⭐⭐⭐ — 4
+            </option>
+
+            <option value={3}>
+              ⭐⭐⭐ — 3
+            </option>
+
+            <option value={2}>
+              ⭐⭐ — 2
+            </option>
+
+            <option value={1}>
+              ⭐ — 1
+            </option>
+          </select>
         </div>
 
-        <div className="card-bottom">
-          <small>
-            ★ {gaming.rating} ·{" "}
-            {gaming.reviews} avis
-          </small>
+        <textarea
+          value={comment}
+          onChange={(e) =>
+            setComment(e.target.value)
+          }
+          placeholder={
+            user
+              ? "Écrivez votre avis..."
+              : "Connectez-vous pour laisser un avis"
+          }
+          disabled={!user}
+          rows={4}
+          style={{
+            width: "100%",
+            resize: "vertical",
+            padding: 12,
+            border:
+              "1px solid #e2edf2",
+            borderRadius: 11,
+            outline: "none",
+          }}
+        />
 
-          <b>Voir →</b>
+        {!user ? (
+          <button
+            type="button"
+            onClick={onAuth}
+            style={{
+              border: 0,
+              background: "#1499dc",
+              color: "#fff",
+              padding: 12,
+              borderRadius: 10,
+              fontWeight: 800,
+            }}
+          >
+            Se connecter pour commenter
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              border: 0,
+              background: "#1499dc",
+              color: "#fff",
+              padding: 12,
+              borderRadius: 10,
+              fontWeight: 800,
+            }}
+          >
+            {loading
+              ? "Publication..."
+              : "Publier mon avis"}
+          </button>
+        )}
+      </form>
+    </section>
+  );
+}
+ /* =========================================================
+   PLACE PHOTOS
+========================================================= */
+
+function PlacePhotos({ item, user, onAuth }) {
+  const [photos, setPhotos] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const placeId = item.id;
+
+  async function loadPhotos() {
+    const { data, error } = await supabase
+      .from("restaurant_photos")
+      .select("id, place_id, image_url, created_at")
+      .eq("place_id", placeId)
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      console.error("Photos error:", error);
+      return;
+    }
+
+    setPhotos(data || []);
+  }
+
+  useEffect(() => {
+    loadPhotos();
+  }, [placeId]);
+
+  async function handleUpload(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!user) {
+      onAuth();
+      event.target.value = "";
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setMessage("Veuillez choisir une image.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("La photo doit faire moins de 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setUploading(true);
+    setMessage("");
+
+    try {
+      const extension =
+        file.name.split(".").pop() || "jpg";
+
+      const fileName =
+        `${placeId}/${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}.${extension}`;
+
+      const { error: uploadError } =
+        await supabase.storage
+          .from("restaurant-photos")
+          .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } =
+        supabase.storage
+          .from("restaurant-photos")
+          .getPublicUrl(fileName);
+
+      const imageUrl =
+        publicUrlData.publicUrl;
+
+      const { error: insertError } =
+        await supabase
+          .from("restaurant_photos")
+          .insert({
+            place_id: placeId,
+            image_url: imageUrl,
+          });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      setMessage(
+        "Photo ajoutée avec succès ✨"
+      );
+
+      await loadPhotos();
+    } catch (error) {
+      console.error(
+        "Upload error:",
+        error
+      );
+
+      setMessage(
+        error.message ||
+          "Impossible d'ajouter la photo."
+      );
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  return (
+    <section className="detail-card-modern">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h2>📸 Photos</h2>
+
+          <p
+            style={{
+              marginTop: 5,
+              color: "#728492",
+            }}
+          >
+            Partagez une photo de cet endroit
+          </p>
         </div>
+
+        <label
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "11px 16px",
+            borderRadius: 14,
+            background: "#1499dc",
+            color: "#fff",
+            fontWeight: 700,
+            cursor: uploading
+              ? "wait"
+              : "pointer",
+            opacity: uploading ? 0.7 : 1,
+          }}
+        >
+          {uploading
+            ? "⏳ Upload..."
+            : "📷 Ajouter une photo"}
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleUpload}
+            disabled={uploading}
+            style={{
+              display: "none",
+            }}
+          />
+        </label>
       </div>
-    </article>
+
+      {message && (
+        <p
+          style={{
+            marginTop: 12,
+            color: "#087bb7",
+            fontWeight: 600,
+          }}
+        >
+          {message}
+        </p>
+      )}
+
+      {photos.length > 0 ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fill, minmax(180px, 1fr))",
+            gap: 14,
+            marginTop: 18,
+          }}
+        >
+          {photos.map((photo) => (
+            <img
+              key={photo.id}
+              src={photo.image_url}
+              alt={`Photo de ${item.name}`}
+              style={{
+                width: "100%",
+                height: 180,
+                objectFit: "cover",
+                borderRadius: 16,
+                display: "block",
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{
+            marginTop: 18,
+            padding: 25,
+            textAlign: "center",
+            borderRadius: 16,
+            background: "#f5fafc",
+            color: "#728492",
+          }}
+        >
+          Aucune photo pour le moment 📷
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -1176,686 +1195,652 @@ function GamingCard({ gaming, openGaming }) {
 function DetailPage({
   item,
   type,
-  goHome,
-  openCategory,
-  menuOpen,
-  setMenuOpen,
+  onBack,
+  user,
+  onAuth,
 }) {
-  const isRestaurant =
-    type === "restaurant";
+  const image = getImage(item, type);
 
-  const isGaming = type === "gaming";
+  const rating = Number(
+    item.rating || 0
+  );
 
-  const image = isGaming
-    ? gamingImage
-    : isRestaurant
-    ? foodImage
-    : hotelImage;
-
-  const categoryName = isGaming
-    ? "Gaming"
-    : isRestaurant
-    ? "Restaurants"
-    : "Hôtels";
-
-  const typeLabel = isGaming
-    ? "GAMING"
-    : isRestaurant
-    ? "RESTAURANT"
-    : "HÔTEL";
-
-  let informationType = "";
-
-  if (isGaming) {
-    informationType =
-      item.type.join(" · ");
-  } else if (isRestaurant) {
-    informationType =
-      item.cuisine.join(" · ");
-  } else {
-    informationType =
-      `Hôtel ${item.stars} étoiles`;
-  }
-
-  const priceText =
-    isRestaurant || isGaming
-      ? item.price
-      : item.price > 0
-      ? `${item.price} DH / nuit`
-      : "Tarif à vérifier";
-
-  function handleBack() {
-    openCategory(
-      isGaming
-        ? "gaming"
-        : isRestaurant
-        ? "restaurants"
-        : "hotels"
-    );
-  }
+  const services =
+    Array.isArray(item.services)
+      ? item.services
+      : typeof item.services === "string"
+      ? item.services
+          .split(",")
+          .map((x) => x.trim())
+          .filter(Boolean)
+      : [];
 
   return (
-    <div className="app">
-      <Navbar
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-        goHome={goHome}
-        openCategory={openCategory}
-      />
+    <main className="detail-page-modern">
+      <button
+        className="back-link"
+        onClick={() => {
+          onBack();
+          scrollTop();
+        }}
+      >
+        ← Retour à l'exploration
+      </button>
 
-      <main className="detail-page-modern">
-        <button
-          className="back-link"
-          type="button"
-          onClick={handleBack}
-        >
-          ← Retour
-        </button>
+      <div className="detail-breadcrumb">
+        Accueil /{" "}
+        {getCategoryName(type)} /{" "}
+        {item.name}
+      </div>
 
-        <div className="detail-breadcrumb">
-          Accueil · {categoryName} ·{" "}
-          {item.name}
-        </div>
+      <section className="detail-hero-modern">
+        <div>
+          <span className="page-kicker">
+            {getCategoryName(type)}
+          </span>
 
-        <section className="detail-hero-modern">
-          <div>
-            <span className="eyebrow">
-              {typeLabel}
+          <h1>
+            {item.name ||
+              "Lieu sans nom"}
+          </h1>
+
+          <div className="detail-rating">
+            <strong>
+              {rating
+                ? rating.toFixed(1)
+                : "N/A"}
+            </strong>
+
+            <span>
+              {"★".repeat(
+                Math.round(rating)
+              )}
+              {"☆".repeat(
+                Math.max(
+                  0,
+                  5 -
+                    Math.round(
+                      rating
+                    )
+                )
+              )}
             </span>
 
-            <h1>{item.name}</h1>
-
-            <div className="detail-rating">
-              <strong>{item.rating}</strong>
-              <span>★★★★★</span>
-              <small>
-                {item.reviews} avis
-              </small>
-            </div>
-
-            <p>📍 {item.address}</p>
-
-            <div className="detail-actions">
-              <a
-                href={mapsUrl(
-                  item.coordinates
-                )}
-                target="_blank"
-                rel="noreferrer"
-              >
-                ⌖ Voir sur la carte
-              </a>
-
-              {item.phone ? (
-                <a
-                  className="primary"
-                  href={`tel:${item.phone}`}
-                >
-                  ☎ Appeler
-                </a>
-              ) : (
-                <button
-                  className="primary"
-                  type="button"
-                  disabled
-                >
-                  ☎ Téléphone indisponible
-                </button>
-              )}
-            </div>
+            <small>
+              {item.reviews || 0} avis
+            </small>
           </div>
 
+          <p>
+            📍{" "}
+            {item.address ||
+              "Al Hoceima, Maroc"}
+          </p>
+
+          {item.description && (
+            <p
+              style={{
+                marginTop: 14,
+                maxWidth: 580,
+              }}
+            >
+              {item.description}
+            </p>
+          )}
+
+          <div className="detail-actions">
+            <a
+              className="primary"
+              href={mapsUrl(item)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              📍 Voir sur Maps
+            </a>
+
+            {item.phone && (
+              <a
+                href={`tel:${item.phone}`}
+              >
+                ☎ Appeler
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div>
           <div
             className="detail-main-photo"
             style={{
               backgroundImage: `url("${image}")`,
             }}
           >
-            <span>1 / 4</span>
+            <span>
+              📷 VillaMap
+            </span>
           </div>
-        </section>
 
-        <div className="detail-thumbs">
-          <div
-            style={{
-              backgroundImage: `url("${image}")`,
-            }}
-          />
+          <div className="detail-thumbs">
+            <div
+              style={{
+                backgroundImage: `url("${image}")`,
+              }}
+            />
 
-          <div
-            style={{
-              backgroundImage: `url("${beachImage}")`,
-            }}
-          />
+            <div
+              style={{
+                backgroundImage: `url("${image}")`,
+              }}
+            />
 
-          <div
-            style={{
-              backgroundImage: `url("${foodImage}")`,
-            }}
-          />
+            <div
+              style={{
+                backgroundImage: `url("${image}")`,
+              }}
+            />
 
-          <div
-            style={{
-              backgroundImage: `url("${gamingImage}")`,
-            }}
-          />
+            <div
+              style={{
+                backgroundImage: `url("${image}")`,
+              }}
+            />
+          </div>
         </div>
+      </section>
 
-        <div className="detail-layout-modern">
-          <div className="detail-content-modern">
-            <section className="detail-card-modern">
-              <h2>À propos</h2>
-              <p>{item.description}</p>
-            </section>
+      <div className="detail-layout-modern">
+        <div className="detail-content-modern">
+          <section className="detail-card-modern">
+            <h2>
+              Informations pratiques
+            </h2>
 
-            <section className="detail-card-modern">
-              <h2>
-                Informations pratiques
-              </h2>
+            <div className="info-list">
+              <div>
+                <span>⌖</span>
+                <label>
+                  Adresse
+                </label>
+                <strong>
+                  {item.address ||
+                    "Al Hoceima"}
+                </strong>
+              </div>
 
-              <div className="info-list">
-                <div>
-                  <span>⌁</span>
-                  <label>Type</label>
-                  <strong>
-                    {informationType}
-                  </strong>
-                </div>
+              <div>
+                <span>★</span>
+                <label>
+                  Note
+                </label>
+                <strong>
+                  {rating
+                    ? `${rating.toFixed(
+                        1
+                      )}/5`
+                    : "Pas encore noté"}
+                </strong>
+              </div>
 
-                <div>
-                  <span>⌖</span>
-                  <label>
-                    Localisation
-                  </label>
-                  <strong>
-                    {item.location}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>◷</span>
-                  <label>Horaires</label>
-                  <strong>
-                    {item.hours}
-                  </strong>
-                </div>
-
+              {item.phone && (
                 <div>
                   <span>☎</span>
-                  <label>Téléphone</label>
+                  <label>
+                    Téléphone
+                  </label>
                   <strong>
-                    {item.phone ||
-                      "Non disponible"}
+                    {item.phone}
                   </strong>
                 </div>
+              )}
 
+              {item.price && (
                 <div>
                   <span>DH</span>
-                  <label>Prix</label>
+                  <label>
+                    Prix indicatif
+                  </label>
                   <strong>
-                    {priceText}
+                    {item.price}
                   </strong>
                 </div>
-              </div>
-            </section>
+              )}
+            </div>
+          </section>
 
+          {services.length > 0 && (
             <section className="detail-card-modern">
               <h2>
-                Services disponibles
+                Services
               </h2>
 
               <div className="service-chips">
-                {item.services.map(
-                  (service) => (
-                    <span key={service}>
-                      ✓ {service}
+                {services.map(
+                  (service, index) => (
+                    <span key={index}>
+                      {service}
                     </span>
                   )
                 )}
               </div>
             </section>
+          )}
 
-            {!isRestaurant &&
-              !isGaming &&
-              item.rooms &&
-              item.rooms.length > 0 && (
-                <section className="detail-card-modern">
-                  <h2>
-                    Types de chambres
-                  </h2>
+          {type === "hotels" &&
+            item.rooms && (
+              <section className="detail-card-modern">
+                <h2>
+                  Chambres
+                </h2>
 
-                  <div className="rooms-grid">
-                    {item.rooms.map(
-                      (room) => (
+                <div className="rooms-grid">
+                  {Array.isArray(
+                    item.rooms
+                  ) &&
+                    item.rooms.map(
+                      (room, index) => (
                         <div
                           className="room-card"
-                          key={room.name}
+                          key={index}
                         >
                           <span>
-                            {room.icon}
+                            🛏️
                           </span>
 
                           <div>
                             <strong>
-                              {room.name}
+                              {room.name ||
+                                "Chambre"}
                             </strong>
 
                             <small>
-                              À partir de{" "}
-                              {room.price} DH
+                              {room.price ||
+                                "Prix sur demande"}
                             </small>
                           </div>
                         </div>
                       )
                     )}
-                  </div>
-                </section>
-              )}
+                </div>
+              </section>
+            )}
+<PlacePhotos
+  item={item}
+  user={user}
+  onAuth={onAuth}
+/>
+          <ReviewsSection
+            item={item}
+            type={type}
+            user={user}
+            onAuth={onAuth}
+          />
+        </div>
+
+        <aside className="detail-aside">
+          <div className="aside-card">
+            <span>
+              Prix indicatif
+            </span>
+
+            <strong>
+              {item.price || "Sur demande"}
+            </strong>
+
+            <small>
+              Les prix peuvent varier selon
+              les disponibilités.
+            </small>
+
+            <button
+              onClick={() =>
+                window.open(
+                  mapsUrl(item),
+                  "_blank"
+                )
+              }
+            >
+              📍 Itinéraire
+            </button>
           </div>
 
-          <aside className="detail-aside">
-            <div className="aside-card">
-              <span>
-                Prix indicatif
-              </span>
+          <div
+            className="mini-map-modern"
+            onClick={() =>
+              window.open(
+                mapsUrl(item),
+                "_blank"
+              )
+            }
+          >
+            <span>⌖</span>
 
-              <strong>
-                {priceText}
-              </strong>
-
-              <small>
-                {isGaming
-                  ? "selon la durée"
-                  : isRestaurant
-                  ? "par personne"
-                  : "par nuit"}
-              </small>
-
-              <button
-                type="button"
-                onClick={() =>
-                  alert(
-                    isGaming
-                      ? "La réservation gaming sera bientôt disponible."
-                      : isRestaurant
-                      ? "Le menu sera bientôt disponible."
-                      : "La réservation en ligne sera bientôt disponible."
-                  )
-                }
-              >
-                {isGaming
-                  ? "Réserver une session"
-                  : isRestaurant
-                  ? "Voir le menu"
-                  : "Réserver maintenant"}
-              </button>
-            </div>
-
-            <a
-              className="mini-map-modern"
-              href={mapsUrl(
-                item.coordinates
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span>⌖</span>
-              <b>Al Hoceima</b>
-              <small>
-                Voir sur la carte →
-              </small>
-            </a>
-          </aside>
-        </div>
-      </main>
-    </div>
+            <small>
+              Ouvrir dans Google Maps →
+            </small>
+          </div>
+        </aside>
+      </div>
+    </main>
   );
 }
 
 /* =========================================================
-   EMPTY
+   EMPTY RESULTS
 ========================================================= */
 
-function EmptyResults() {
+function EmptyResults({
+  search,
+  category,
+}) {
   return (
     <div className="empty-category">
       <span>⌕</span>
 
-      <h2>Aucun résultat</h2>
+      <h2>
+        Aucun résultat
+      </h2>
 
       <p>
-        Essayez une autre recherche ou un
-        autre filtre.
+        {search
+          ? `Aucun résultat pour "${search}".`
+          : `Aucun lieu disponible dans ${getCategoryName(
+              category
+            )}.`}
       </p>
     </div>
   );
 }
 
 /* =========================================================
-   EXPLORER
+   EXPLORER PAGE
 ========================================================= */
 
 function ExplorerPage({
-  category,
+  placesData,
   search,
   setSearch,
-  openHotel,
-  openRestaurant,
-  openGaming,
-  openCategory,
-  goHome,
-  menuOpen,
-  setMenuOpen,
+  selectedCategory,
+  setSelectedCategory,
+  onPlace,
 }) {
-  const [filter, setFilter] =
+  const [activeFilter, setActiveFilter] =
     useState("Tous");
 
-  const isHotel =
-    category === "hotels";
+  const currentCategory =
+    selectedCategory || "all";
 
-  const isRestaurant =
-    category === "restaurants";
+  const allPlaces = useMemo(() => {
+    const result = [];
 
-  const isGaming =
-    category === "gaming";
-
-  const categoryObject =
-    categories.find(
-      (item) => item.id === category
+    Object.entries(placesData).forEach(
+      ([type, places]) => {
+        places.forEach((place) => {
+          result.push({
+            ...place,
+            _type: type,
+          });
+        });
+      }
     );
 
-  const categoryTitle = isHotel
-    ? "Hôtels à Al Hoceima"
-    : isRestaurant
-    ? "Restaurants à Al Hoceima"
-    : isGaming
-    ? "Gaming à Al Hoceima"
-    : categoryObject?.name ||
-      "Explorer";
+    return result;
+  }, [placesData]);
 
-  const filteredHotels =
-    useMemo(() => {
-      const query =
-        search.toLowerCase().trim();
+  const categoriesToShow =
+    currentCategory === "all"
+      ? allPlaces
+      : (
+          placesData[currentCategory] ||
+          []
+        ).map((place) => ({
+          ...place,
+          _type: currentCategory,
+        }));
 
-      return hotels.filter((hotel) => {
-        const text =
-          `${hotel.name} ${hotel.location} ${hotel.address}`.toLowerCase();
+  const filters = useMemo(() => {
+    const tags = new Set();
 
-        if (!text.includes(query)) {
-          return false;
-        }
+    categoriesToShow.forEach((place) => {
+      if (Array.isArray(place.services)) {
+        place.services.forEach((service) =>
+          tags.add(service)
+        );
+      }
 
-        if (filter === "4★ et +") {
-          return hotel.stars >= 4;
-        }
+      if (Array.isArray(place.tags)) {
+        place.tags.forEach((tag) =>
+          tags.add(tag)
+        );
+      }
+    });
 
-        return true;
-      });
-    }, [search, filter]);
+    return [
+      "Tous",
+      ...Array.from(tags).slice(0, 8),
+    ];
+  }, [categoriesToShow]);
 
-  const filteredRestaurants =
-    useMemo(() => {
-      const query =
-        search.toLowerCase().trim();
+  const normalizeText = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
 
-      return restaurants.filter(
-        (restaurant) => {
-          const text =
-            `${restaurant.name} ${restaurant.location} ${restaurant.address} ${restaurant.cuisine.join(
-              " "
-            )}`.toLowerCase();
+const filtered = categoriesToShow.filter((place) => {
+  const searchText = normalizeText(search);
 
-          if (!text.includes(query)) {
-            return false;
-          }
+  const searchableText = normalizeText(
+    [
+      place.name,
+      place.title,
+      place.address,
+      place.location,
+      place.description,
+      place.category,
+      place.type,
+      place._type,
+      place.phone,
+      place.email,
+      Array.isArray(place.services)
+        ? place.services.join(" ")
+        : place.services,
+      Array.isArray(place.tags)
+        ? place.tags.join(" ")
+        : place.tags,
+    ]
+      .filter(Boolean)
+      .join(" ")
+  );
 
-          if (
-            [
-              "Italienne",
-              "Marocaine",
-              "Fruits de mer",
-            ].includes(filter)
-          ) {
-            return restaurant.cuisine.includes(
-              filter
-            );
-          }
+  const matchesSearch =
+    !searchText ||
+    searchableText.includes(searchText);
 
-          if (filter === "4★ et +") {
-            return restaurant.rating >= 4;
-          }
+  const matchesFilter =
+    activeFilter === "Tous" ||
+    (Array.isArray(place.services) &&
+      place.services.some(
+        (service) =>
+          normalizeText(service) ===
+          normalizeText(activeFilter)
+      )) ||
+    (Array.isArray(place.tags) &&
+      place.tags.some(
+        (tag) =>
+          normalizeText(tag) ===
+          normalizeText(activeFilter)
+      ));
 
-          return true;
-        }
-      );
-    }, [search, filter]);
-
-  const filteredGaming =
-    useMemo(() => {
-      const query =
-        search.toLowerCase().trim();
-
-      return gamingPlaces.filter(
-        (gaming) => {
-          const text =
-            `${gaming.name} ${gaming.location} ${gaming.address} ${gaming.type.join(
-              " "
-            )}`.toLowerCase();
-
-          if (!text.includes(query)) {
-            return false;
-          }
-
-          if (filter === "4★ et +") {
-            return gaming.rating >= 4;
-          }
-
-          if (filter === "PC Gaming") {
-            return gaming.type.includes(
-              "PC Gaming"
-            );
-          }
-
-          if (filter === "PS5") {
-            return gaming.type.includes(
-              "PS5"
-            );
-          }
-
-          return true;
-        }
-      );
-    }, [search, filter]);
-
-  const filters = isRestaurant
-    ? [
-        "Tous",
-        "Italienne",
-        "Marocaine",
-        "Fruits de mer",
-        "4★ et +",
-      ]
-    : isGaming
-    ? [
-        "Tous",
-        "PC Gaming",
-        "PS5",
-        "4★ et +",
-      ]
-    : ["Tous", "4★ et +"];
+  return matchesSearch && matchesFilter;
+});
 
   return (
-    <div className="app">
-      <Navbar
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-        goHome={goHome}
-        openCategory={openCategory}
+    <main className="explorer-page">
+      <span className="page-kicker">
+        EXPLORE AL HOCEIMA
+      </span>
+
+      <h1>
+        Trouvez votre prochain endroit
+      </h1>
+
+      <p>
+        Hôtels, restaurants, cafés,
+        gaming, shopping et bien plus.
+      </p>
+
+      <SearchBox
+        value={search}
+        onChange={setSearch}
+        onSubmit={() => {}}
+        full
       />
 
-      <main className="explorer-page">
-        <div className="page-kicker">
-          EXPLORER
+      <div className="filter-row">
+        <button
+          className={
+            currentCategory === "all"
+              ? "active"
+              : ""
+          }
+          onClick={() => {
+            setSelectedCategory("all");
+            setActiveFilter("Tous");
+          }}
+        >
+          Tout
+        </button>
+
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            className={
+              currentCategory ===
+              category.id
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              setSelectedCategory(
+                category.id
+              );
+              setActiveFilter("Tous");
+            }}
+          >
+            {category.icon}{" "}
+            {category.name}
+          </button>
+        ))}
+      </div>
+
+      {filters.length > 1 && (
+        <div className="filter-row">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              className={
+                activeFilter === filter
+                  ? "active"
+                  : ""
+              }
+              onClick={() =>
+                setActiveFilter(filter)
+              }
+            >
+              {filter}
+            </button>
+          ))}
         </div>
+      )}
 
-        <h1>{categoryTitle}</h1>
-
-        <p>
-          Découvrez facilement les meilleurs
-          établissements disponibles à Al
-          Hoceima.
-        </p>
-
-        <SearchBox
-          full
-          value={search}
-          onChange={setSearch}
+      {filtered.length === 0 ? (
+        <EmptyResults
+          search={search}
+          category={
+            currentCategory === "all"
+              ? "hotels"
+              : currentCategory
+          }
         />
-
-        {(isRestaurant ||
-          isHotel ||
-          isGaming) && (
-          <div className="filter-row">
-            {filters.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={
-                  filter === item
-                    ? "active"
-                    : ""
-                }
-                onClick={() =>
-                  setFilter(item)
-                }
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {isHotel &&
-          (filteredHotels.length > 0 ? (
-            <div className="listing-grid">
-              {filteredHotels.map(
-                (hotel) => (
-                  <HotelCard
-                    key={hotel.id}
-                    hotel={hotel}
-                    openHotel={openHotel}
-                  />
-                )
-              )}
-            </div>
-          ) : (
-            <EmptyResults />
+      ) : (
+        <div className="listing-grid">
+          {filtered.map((place) => (
+            <PlaceCard
+              key={`${place._type}-${place.id}`}
+              item={place}
+              type={place._type}
+              onClick={onPlace}
+            />
           ))}
-
-        {isRestaurant &&
-          (filteredRestaurants.length >
-          0 ? (
-            <div className="listing-grid">
-              {filteredRestaurants.map(
-                (restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                    openRestaurant={
-                      openRestaurant
-                    }
-                  />
-                )
-              )}
-            </div>
-          ) : (
-            <EmptyResults />
-          ))}
-
-        {isGaming &&
-          (filteredGaming.length > 0 ? (
-            <div className="listing-grid">
-              {filteredGaming.map(
-                (gaming) => (
-                  <GamingCard
-                    key={gaming.id}
-                    gaming={gaming}
-                    openGaming={openGaming}
-                  />
-                )
-              )}
-            </div>
-          ) : (
-            <EmptyResults />
-          ))}
-
-        {!isHotel &&
-          !isRestaurant &&
-          !isGaming && (
-            <div className="empty-category">
-              <span>
-                {categoryObject?.icon ||
-                  "✦"}
-              </span>
-
-              <h2>{categoryTitle}</h2>
-
-              <p>
-                Cette catégorie sera bientôt
-                disponible sur VillaMap.
-              </p>
-            </div>
-          )}
-      </main>
-    </div>
+        </div>
+      )}
+    </main>
   );
 }
 
 /* =========================================================
-   HOME
+   HOME PAGE
 ========================================================= */
 
 function HomePage({
+  placesData,
   search,
   setSearch,
-  openCategory,
-  openHotel,
-  openRestaurant,
-  openGaming,
+  onSearch,
+  onCategory,
+  onPlace,
 }) {
-  function handleHomeSearch(value) {
-    setSearch(value);
+  const featuredRestaurants =
+    placesData.restaurants?.slice(
+      0,
+      3
+    ) || [];
 
-    if (value.trim()) {
-      openCategory("restaurants");
-    }
-  }
+  const featuredHotels =
+    placesData.hotels?.slice(0, 3) || [];
+
+  const featuredGaming =
+    placesData.gaming?.slice(0, 3) || [];
 
   return (
-    <main>
-      <section className="hero-modern">
+    <>
+      {/* =====================================================
+          HERO
+      ===================================================== */}
+
+      <main className="hero-modern">
         <div className="hero-copy">
           <span className="page-kicker">
-            📍 AL HOCEIMA, MAROC
+            VOTRE GUIDE LOCAL
           </span>
 
           <h1>
             Découvrez
             <br />
-            <em>Al Hoceima.</em>
+            <em>Al Hoceima</em>
           </h1>
 
           <p>
-            Hôtels, restaurants, gaming,
-            cafés, activités et services
-            réunis au même endroit.
+            Explorez les meilleurs hôtels,
+            restaurants, cafés, activités
+            et adresses locales de la ville.
           </p>
 
           <SearchBox
             value={search}
-            onChange={handleHomeSearch}
+            onChange={setSearch}
+            onSubmit={onSearch}
           />
+
+          {/* HERO HIGHLIGHTS */}
+
+          <div className="hero-highlights">
+            <span>🏨 Hôtels</span>
+            <span>🍴 Restaurants</span>
+            <span>☕ Cafés</span>
+            <span>📍 Activités</span>
+          </div>
         </div>
 
         <div className="hero-visual">
@@ -1869,87 +1854,196 @@ function HomePage({
               ⌖
             </span>
 
-            <span>
+            <div>
               Al Hoceima
-              <br />
               <small>
-                Votre guide local
+                Maroc · Méditerranée
               </small>
-            </span>
+            </div>
           </div>
         </div>
-      </section>
+      </main>
+
+      {/* =====================================================
+          CATEGORIES
+      ===================================================== */}
 
       <section className="section-modern">
         <div className="section-heading">
           <div>
             <span className="page-kicker">
-              EXPLORER
+              EXPLOREZ
             </span>
 
             <h2>
-              Tout ce dont vous avez
-              besoin
+              Qu'est-ce que vous cherchez ?
             </h2>
 
             <p>
-              Trouvez rapidement ce qui vous
-              intéresse.
+              Découvrez les différentes
+              catégories de VillaMap.
             </p>
           </div>
 
           <button
-            type="button"
-            onClick={() =>
-              openCategory("restaurants")
-            }
+            onClick={() => {
+              onCategory("all");
+              scrollTop();
+            }}
           >
-            Tout voir →
+            Tout explorer →
           </button>
         </div>
 
         <CategoryGrid
-          openCategory={openCategory}
+          onCategory={onCategory}
+          data={placesData}
         />
       </section>
 
-      <section className="section-modern soft">
-        <div className="section-heading">
-          <div>
-            <span className="page-kicker">
-              POPULAIRE
-            </span>
+      {/* =====================================================
+          RESTAURANTS
+      ===================================================== */}
 
-            <h2>
-              Les établissements du moment
-            </h2>
+      {featuredRestaurants.length >
+        0 && (
+        <section className="section-modern soft">
+          <div className="section-heading">
+            <div>
+              <span className="page-kicker">
+                À TABLE
+              </span>
 
-            <p>
-              Une sélection pour commencer
-              votre découverte.
-            </p>
+              <h2>
+                Restaurants populaires
+              </h2>
+
+              <p>
+                Quelques adresses à découvrir.
+              </p>
+            </div>
+
+            <button
+              onClick={() =>
+                onCategory(
+                  "restaurants"
+                )
+              }
+            >
+              Voir tout →
+            </button>
           </div>
-        </div>
 
-        <div className="featured-grid">
-          <RestaurantCard
-            restaurant={restaurants[0]}
-            openRestaurant={
-              openRestaurant
-            }
-          />
+          <div className="featured-grid">
+            {featuredRestaurants.map(
+              (place) => (
+                <PlaceCard
+                  key={`restaurant-${place.id}`}
+                  item={place}
+                  type="restaurants"
+                  onClick={onPlace}
+                />
+              )
+            )}
+          </div>
+        </section>
+      )}
 
-          <HotelCard
-            hotel={hotels[0]}
-            openHotel={openHotel}
-          />
+      {/* =====================================================
+          HOTELS
+      ===================================================== */}
 
-          <GamingCard
-            gaming={gamingPlaces[0]}
-            openGaming={openGaming}
-          />
-        </div>
-      </section>
+      {featuredHotels.length > 0 && (
+        <section className="section-modern">
+          <div className="section-heading">
+            <div>
+              <span className="page-kicker">
+                SÉJOUR
+              </span>
+
+              <h2>
+                Où dormir ?
+              </h2>
+
+              <p>
+                Découvrez les hébergements
+                disponibles.
+              </p>
+            </div>
+
+            <button
+              onClick={() =>
+                onCategory("hotels")
+              }
+            >
+              Voir les hôtels →
+            </button>
+          </div>
+
+          <div className="featured-grid">
+            {featuredHotels.map(
+              (place) => (
+                <PlaceCard
+                  key={`hotel-${place.id}`}
+                  item={place}
+                  type="hotels"
+                  onClick={onPlace}
+                />
+              )
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* =====================================================
+          GAMING
+      ===================================================== */}
+
+      {featuredGaming.length > 0 && (
+        <section className="section-modern soft">
+          <div className="section-heading">
+            <div>
+              <span className="page-kicker">
+                GAMING
+              </span>
+
+              <h2>
+                Gaming à Al Hoceima
+              </h2>
+
+              <p>
+                PlayStation, PC gaming et
+                espaces gaming.
+              </p>
+            </div>
+
+            <button
+              onClick={() =>
+                onCategory("gaming")
+              }
+            >
+              Voir tout →
+            </button>
+          </div>
+
+          <div className="featured-grid">
+            {featuredGaming.map(
+              (place) => (
+                <PlaceCard
+                  key={`gaming-${place.id}`}
+                  item={place}
+                  type="gaming"
+                  onClick={onPlace}
+                />
+              )
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* =====================================================
+          ABOUT
+      ===================================================== */}
 
       <section
         className="about-modern"
@@ -1957,54 +2051,67 @@ function HomePage({
       >
         <div>
           <span className="page-kicker">
-            POURQUOI VILLAMAP ?
+            À PROPOS
           </span>
 
           <h2>
-            Tout Al Hoceima,
+            Al Hoceima,
             <br />
-            <em>au même endroit.</em>
+            <em>autrement.</em>
           </h2>
 
           <p>
-            VillaMap simplifie la découverte
-            de la ville. Que vous soyez
-            résident ou visiteur, trouvez
-            rapidement les établissements et
-            activités qui vous intéressent.
+            VillaMap est un guide local pensé
+            pour faciliter la découverte
+            d'Al Hoceima. Trouvez rapidement
+            les lieux, consultez les
+            informations pratiques et
+            découvrez les adresses appréciées
+            par la communauté.
           </p>
         </div>
 
         <div className="about-points">
           <div>
-            <b>⌖</b>
-            <strong>Local</strong>
-            <span>
-              Pensé spécialement pour Al
-              Hoceima.
-            </span>
-          </div>
-
-          <div>
             <b>⌕</b>
-            <strong>Simple</strong>
+
+            <strong>
+              Trouvez facilement
+            </strong>
+
             <span>
-              Trouvez rapidement ce que vous
-              cherchez.
+              Une recherche simple et rapide.
             </span>
           </div>
 
           <div>
-            <b>🎮</b>
-            <strong>Gaming</strong>
+            <b>★</b>
+
+            <strong>
+              Découvrez les avis
+            </strong>
+
             <span>
-              Découvrez aussi les espaces
-              gaming de la ville.
+              Consultez les expériences des
+              visiteurs.
+            </span>
+          </div>
+
+          <div>
+            <b>⌖</b>
+
+            <strong>
+              Localisez les endroits
+            </strong>
+
+            <span>
+              Ouvrez directement les lieux
+              dans Google Maps.
             </span>
           </div>
         </div>
       </section>
-    </main>
+    </>
   );
 }
 
@@ -2017,7 +2124,7 @@ function Footer() {
     <footer>
       <div>
         <strong>
-          <span>⌖</span> VillaMap
+          Villa<span>Map</span>
         </strong>
 
         <p>
@@ -2026,13 +2133,413 @@ function Footer() {
       </div>
 
       <small>
-        © 2026 VillaMap · Al Hoceima,
-        Maroc
+        © {new Date().getFullYear()} VillaMap
+        · Al Hoceima, Maroc
       </small>
     </footer>
   );
 }
 
+/* =========================================================
+   NORMALIZE DATABASE DATA
+========================================================= */
+
+function normalizePlace(place) {
+  let category = String(
+    place.category || ""
+  )
+    .toLowerCase()
+    .trim();
+
+  const aliases = {
+    hotel: "hotels",
+    hotels: "hotels",
+    hôtel: "hotels",
+    hôtels: "hotels",
+
+    restaurant: "restaurants",
+    restaurants: "restaurants",
+
+    pharmacie: "pharmacies",
+    pharmacies: "pharmacies",
+
+    cafe: "cafes",
+    cafés: "cafes",
+    cafes: "cafes",
+
+    beauté: "beauty",
+    beaute: "beauty",
+    beauty: "beauty",
+
+    gaming: "gaming",
+
+    shopping: "shopping",
+
+    activité: "activities",
+    activités: "activities",
+    activites: "activities",
+    activity: "activities",
+    activities: "activities",
+
+    transport: "transport",
+  };
+
+  category =
+    aliases[category] || category;
+
+  return {
+    ...place,
+
+    category,
+
+    name:
+      place.name ||
+      place.title ||
+      "Lieu sans nom",
+
+    address:
+      place.address ||
+      place.location ||
+      "Al Hoceima, Maroc",
+
+    image:
+      place.image ||
+      place.image_url ||
+      place.photo ||
+      place.cover ||
+      fallbackImages[category],
+
+    rating: Number(
+      place.rating || 0
+    ),
+
+    reviews: Number(
+      place.reviews ||
+        place.reviews_count ||
+        0
+    ),
+  };
+}
+/* =========================================================
+   ADMIN PAGE
+========================================================= */
+
+function AdminPage({ placesData, onPlacesUpdated }) {
+  const [search, setSearch] = useState("");
+  const [uploadingId, setUploadingId] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const allPlaces = useMemo(() => {
+    const result = [];
+
+    Object.entries(placesData).forEach(
+      ([type, places]) => {
+        places.forEach((place) => {
+          result.push({
+            ...place,
+            _type: type,
+          });
+        });
+      }
+    );
+
+    return result;
+  }, [placesData]);
+
+  const filteredPlaces = allPlaces.filter((place) => {
+    const text = `${place.name || ""} ${
+      place.address || ""
+    } ${place._type || ""}`.toLowerCase();
+
+    return text.includes(search.toLowerCase());
+  });
+
+  async function changeMainPhoto(place, event) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setMessage("Veuillez choisir une image.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("La photo doit faire moins de 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setUploadingId(place.id);
+    setMessage("");
+
+    try {
+      const extension =
+        file.name.split(".").pop() || "jpg";
+
+      const fileName =
+        `main/${place.id}/${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}.${extension}`;
+
+      const { error: uploadError } =
+        await supabase.storage
+          .from("restaurant-photos")
+          .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } =
+        supabase.storage
+          .from("restaurant-photos")
+          .getPublicUrl(fileName);
+
+      const imageUrl =
+        publicUrlData.publicUrl;
+
+      const { error: updateError } =
+        await supabase
+          .from("places")
+          .update({
+            main_image_url: imageUrl,
+          })
+          .eq("id", place.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setMessage(
+        `Photo de "${place.name}" mise à jour avec succès ✨`
+      );
+
+      await onPlacesUpdated?.();
+    } catch (error) {
+      console.error(
+        "Admin photo error:",
+        error
+      );
+
+      setMessage(
+        error.message ||
+          "Impossible de modifier la photo."
+      );
+    } finally {
+      setUploadingId(null);
+      event.target.value = "";
+    }
+  }
+
+  return (
+    <main
+      style={{
+        maxWidth: 1200,
+        margin: "0 auto",
+        padding: "50px 24px 80px",
+      }}
+    >
+      <span className="page-kicker">
+        VILLAMAP ADMIN
+      </span>
+
+      <h1
+        style={{
+          marginTop: 8,
+          fontSize: "clamp(32px, 5vw, 52px)",
+        }}
+      >
+        Gestion des photos 📸
+      </h1>
+
+      <p
+        style={{
+          marginTop: 10,
+          color: "#728492",
+        }}
+      >
+        Changez directement les photos
+        principales de vos lieux.
+      </p>
+
+      <div
+        style={{
+          marginTop: 25,
+          marginBottom: 25,
+        }}
+      >
+        <input
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          placeholder="🔍 Rechercher un hôtel, restaurant..."
+          style={{
+            width: "100%",
+            maxWidth: 600,
+            padding: "15px 17px",
+            border: "1px solid #e2edf2",
+            borderRadius: 14,
+            outline: "none",
+            fontSize: 15,
+          }}
+        />
+      </div>
+
+      {message && (
+        <div
+          style={{
+            marginBottom: 22,
+            padding: 14,
+            borderRadius: 14,
+            background: "#eaf7fd",
+            color: "#087bb7",
+            fontWeight: 700,
+          }}
+        >
+          {message}
+        </div>
+      )}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fill, minmax(280px, 1fr))",
+          gap: 20,
+        }}
+      >
+        {filteredPlaces.map((place) => (
+          <article
+            key={`${place._type}-${place.id}`}
+            style={{
+              background: "#fff",
+              border: "1px solid #e2edf2",
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow:
+                "0 10px 30px rgba(22,50,70,.06)",
+            }}
+          >
+            <img
+              src={getImage(
+                place,
+                place._type
+              )}
+              alt={place.name}
+              style={{
+                width: "100%",
+                height: 200,
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+
+            <div
+              style={{
+                padding: 18,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: "#1499dc",
+                  textTransform: "uppercase",
+                }}
+              >
+                {getCategoryName(
+                  place._type
+                )}
+              </span>
+
+              <h3
+                style={{
+                  marginTop: 6,
+                  marginBottom: 5,
+                }}
+              >
+                {place.name}
+              </h3>
+
+              <p
+                style={{
+                  color: "#728492",
+                  fontSize: 13,
+                  marginBottom: 15,
+                }}
+              >
+                {place.address ||
+                  "Al Hoceima, Maroc"}
+              </p>
+
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  width: "100%",
+                  padding: "12px 15px",
+                  borderRadius: 12,
+                  background: "#1499dc",
+                  color: "#fff",
+                  fontWeight: 800,
+                  cursor:
+                    uploadingId === place.id
+                      ? "wait"
+                      : "pointer",
+                  opacity:
+                    uploadingId === place.id
+                      ? 0.7
+                      : 1,
+                }}
+              >
+                {uploadingId === place.id
+                  ? "⏳ Upload..."
+                  : "📷 Changer la photo"}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={
+                    uploadingId === place.id
+                  }
+                  onChange={(event) =>
+                    changeMainPhoto(
+                      place,
+                      event
+                    )
+                  }
+                  style={{
+                    display: "none",
+                  }}
+                />
+              </label>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {filteredPlaces.length === 0 && (
+        <div
+          style={{
+            padding: 40,
+            textAlign: "center",
+            color: "#728492",
+          }}
+        >
+          Aucun lieu trouvé.
+        </div>
+      )}
+    </main>
+  );
+}
 /* =========================================================
    APP
 ========================================================= */
@@ -2041,127 +2548,242 @@ export default function App() {
   const [search, setSearch] =
     useState("");
 
+  const [placesData, setPlacesData] =
+    useState(emptyData);
+
+  const [loadingPlaces, setLoadingPlaces] =
+    useState(true);
+
+  const [errorPlaces, setErrorPlaces] =
+    useState("");
+
   const [selectedCategory, setSelectedCategory] =
     useState(null);
 
-  const [selectedHotel, setSelectedHotel] =
+  const [selectedPlace, setSelectedPlace] =
     useState(null);
 
-  const [selectedRestaurant, setSelectedRestaurant] =
-    useState(null);
-
-  const [selectedGaming, setSelectedGaming] =
+  const [selectedPlaceType, setSelectedPlaceType] =
     useState(null);
 
   const [menuOpen, setMenuOpen] =
     useState(false);
 
-  function goHome() {
-    setSelectedCategory(null);
-    setSelectedHotel(null);
-    setSelectedRestaurant(null);
-    setSelectedGaming(null);
-    setSearch("");
-    setMenuOpen(false);
+  const [showAuth, setShowAuth] =
+    useState(false);
 
-    scrollTop();
+  const [user, setUser] =
+    useState(null);
+    const [showAdmin, setShowAdmin] = useState(false);
+   
+const ADMIN_EMAIL = "ayaesslimani73@gmail.com";
+
+const isAdmin =
+  user?.email?.toLowerCase() ===
+  ADMIN_EMAIL.toLowerCase();
+  /* =======================================================
+     AUTH
+  ======================================================= */
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (mounted) {
+        setUser(user);
+      }
+    }
+
+    getUser();
+
+    const {
+      data: listener,
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(
+          session?.user || null
+        );
+      }
+    );
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  /* =======================================================
+     LOAD PLACES FROM SUPABASE
+  ======================================================= */
+
+  useEffect(() => {
+    async function loadPlaces() {
+      setLoadingPlaces(true);
+      setErrorPlaces("");
+
+      const { data, error } =
+        await supabase
+          .from("places")
+          .select("*")
+          .order("id", {
+            ascending: true,
+          });
+
+      if (error) {
+        console.error(
+          "Supabase places error:",
+          error
+        );
+
+        setErrorPlaces(
+          "Impossible de charger les lieux depuis Supabase."
+        );
+
+        setLoadingPlaces(false);
+        return;
+      }
+
+      const grouped = {
+        ...emptyData,
+      };
+
+      (data || []).forEach((rawPlace) => {
+        const place =
+          normalizePlace(rawPlace);
+
+        if (
+          grouped[place.category]
+        ) {
+          grouped[
+            place.category
+          ].push(place);
+        }
+      });
+
+      setPlacesData(grouped);
+      setLoadingPlaces(false);
+    }
+
+    loadPlaces();
+  }, []);
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
+
+  function goHome() {
+    setSelectedPlace(null);
+    setSelectedPlaceType(null);
+    setSelectedCategory(null);
+    setSearch("");
+    setShowAdmin(false);
+  }
+
+  function goExplorer(category = "all") {
+    setSelectedPlace(null);
+    setSelectedPlaceType(null);
+    setSelectedCategory(category);
   }
 
   function openCategory(category) {
-    setSelectedCategory(category);
-    setSelectedHotel(null);
-    setSelectedRestaurant(null);
-    setSelectedGaming(null);
-    setSearch("");
-    setMenuOpen(false);
-
-    setTimeout(scrollTop, 50);
+    goExplorer(category);
   }
 
-  function openHotel(hotel) {
-    setSelectedHotel(hotel);
-    setSelectedRestaurant(null);
-    setSelectedGaming(null);
-    setSelectedCategory(null);
-    setMenuOpen(false);
+  function openPlace(item, type) {
+    setSelectedPlace(item);
+    setSelectedPlaceType(type);
+  }
 
+  function backToExplorer() {
+    setSelectedPlace(null);
+    setSelectedPlaceType(null);
+  }
+
+  function handleSearch() {
+    const value = search.trim();
+
+    setSelectedPlace(null);
+    setSelectedPlaceType(null);
+    setSelectedCategory("all");
     scrollTop();
   }
 
-  function openRestaurant(
-    restaurant
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
+  
+let page;
+
+if (showAdmin && isAdmin) {
+  page = (
+    <AdminPage
+      placesData={placesData}
+      onPlacesUpdated={async () => {
+        const { data } = await supabase
+          .from("places")
+          .select("*")
+          .order("id", { ascending: true });
+
+        const grouped = {
+          ...emptyData,
+        };
+
+        (data || []).forEach((rawPlace) => {
+          const place = normalizePlace(rawPlace);
+
+          if (grouped[place.category]) {
+            grouped[place.category].push(place);
+          }
+        });
+
+        setPlacesData(grouped);
+      }}
+    />
+  );
+} else if (
+  selectedPlace &&
+  selectedPlaceType
+) {
+    page = (
+      <DetailPage
+        item={selectedPlace}
+        type={selectedPlaceType}
+        onBack={backToExplorer}
+        user={user}
+        onAuth={() => setShowAuth(true)}
+      />
+    );
+  } else if (
+    selectedCategory !== null
   ) {
-    setSelectedRestaurant(restaurant);
-    setSelectedHotel(null);
-    setSelectedGaming(null);
-    setSelectedCategory(null);
-    setMenuOpen(false);
-
-    scrollTop();
-  }
-
-  function openGaming(gaming) {
-    setSelectedGaming(gaming);
-    setSelectedHotel(null);
-    setSelectedRestaurant(null);
-    setSelectedCategory(null);
-    setMenuOpen(false);
-
-    scrollTop();
-  }
-
-  if (selectedHotel) {
-    return (
-      <DetailPage
-        item={selectedHotel}
-        type="hotel"
-        goHome={goHome}
-        openCategory={openCategory}
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-      />
-    );
-  }
-
-  if (selectedRestaurant) {
-    return (
-      <DetailPage
-        item={selectedRestaurant}
-        type="restaurant"
-        goHome={goHome}
-        openCategory={openCategory}
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-      />
-    );
-  }
-
-  if (selectedGaming) {
-    return (
-      <DetailPage
-        item={selectedGaming}
-        type="gaming"
-        goHome={goHome}
-        openCategory={openCategory}
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-      />
-    );
-  }
-
-  if (selectedCategory) {
-    return (
+    page = (
       <ExplorerPage
-        category={selectedCategory}
+        placesData={placesData}
         search={search}
         setSearch={setSearch}
-        openHotel={openHotel}
-        openRestaurant={openRestaurant}
-        openGaming={openGaming}
-        openCategory={openCategory}
-        goHome={goHome}
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
+        selectedCategory={
+          selectedCategory
+        }
+        setSelectedCategory={
+          setSelectedCategory
+        }
+        onPlace={openPlace}
+      />
+    );
+  } else {
+    page = (
+      <HomePage
+        placesData={placesData}
+        search={search}
+        setSearch={setSearch}
+        onSearch={handleSearch}
+        onCategory={openCategory}
+        onPlace={openPlace}
       />
     );
   }
@@ -2169,22 +2791,84 @@ export default function App() {
   return (
     <div className="app">
       <Navbar
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-        goHome={goHome}
-        openCategory={openCategory}
-      />
-
-      <HomePage
         search={search}
         setSearch={setSearch}
-        openCategory={openCategory}
-        openHotel={openHotel}
-        openRestaurant={openRestaurant}
-        openGaming={openGaming}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        onHome={goHome}
+        onExplorer={() =>
+          goExplorer("all")
+        }
+        onCategory={openCategory}
+        user={user}
+        onAuth={() => setShowAuth(true)}
+        isAdmin={isAdmin}
+onAdmin={() => {
+  setSelectedPlace(null);
+  setSelectedPlaceType(null);
+  setSelectedCategory(null);
+   setShowAdmin(true);
+}}
       />
 
+      {loadingPlaces && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 20,
+            left: "50%",
+            transform:
+              "translateX(-50%)",
+            zIndex: 500,
+            background: "#163246",
+            color: "#fff",
+            padding: "10px 16px",
+            borderRadius: 12,
+            fontSize: 12,
+            boxShadow:
+              "0 10px 30px rgba(0,0,0,.15)",
+          }}
+        >
+          Chargement des lieux...
+        </div>
+      )}
+
+      {errorPlaces && (
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "15px auto",
+            padding: "0 24px",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff4f4",
+              border:
+                "1px solid #ffd4d4",
+              color: "#a94a4a",
+              borderRadius: 12,
+              padding: 12,
+              fontSize: 13,
+            }}
+          >
+            {errorPlaces}
+          </div>
+        </div>
+      )}
+
+      {page}
+
       <Footer />
+
+      {showAuth && (
+        <AuthModal
+          onClose={() =>
+            setShowAuth(false)
+          }
+          onUserChange={setUser}
+        />
+      )}
     </div>
   );
 }

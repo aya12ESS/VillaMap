@@ -1299,3 +1299,513 @@ footer small {
     font-size: 28px;
   }
 }
+/* =========================================================
+   HERO HIGHLIGHTS
+========================================================= */
+
+.hero-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.hero-highlights span {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 5px 16px rgba(20, 80, 110, 0.05);
+  transition: 0.2s ease;
+}
+
+.hero-highlights span:hover {
+  border-color: rgba(20, 153, 220, 0.35);
+  background: var(--soft);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 650px) {
+  .hero-highlights {
+    gap: 6px;
+  }
+
+  .hero-highlights span {
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+}/* =========================================================
+   PREMIUM CATEGORY CARDS
+========================================================= */
+
+.category-grid-modern {
+  gap: 14px;
+}
+
+.category-tile {
+  position: relative;
+  min-height: 125px;
+  padding: 20px;
+  border: 1px solid #e5eef3;
+  border-radius: 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 9px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.category-tile::after {
+  content: "→";
+  position: absolute;
+  right: 18px;
+  bottom: 17px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f1f9fd;
+  color: #1499dc;
+  font-size: 16px;
+  font-weight: 800;
+  transition: 0.22s ease;
+}
+
+.category-tile:hover {
+  transform: translateY(-4px);
+  border-color: rgba(20, 153, 220, 0.25);
+  box-shadow: 0 14px 35px rgba(20, 80, 110, 0.09);
+}
+
+.category-tile:hover::after {
+  background: #1499dc;
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.category-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #eef9fd;
+  color: #1499dc;
+  font-size: 20px;
+  transition: 0.22s ease;
+}
+
+.category-tile:hover .category-icon {
+  transform: scale(1.08);
+  background: #e3f5fc;
+}
+
+.category-tile > span:not(.category-icon) {
+  color: #163246;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.category-tile b {
+  color: #1499dc;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+  .category-grid-modern {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .category-tile {
+    min-height: 115px;
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .category-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    font-size: 17px;
+  }
+
+  .category-tile > span:not(.category-icon) {
+    font-size: 13px;
+  }
+
+  .category-tile::after {
+    right: 12px;
+    bottom: 12px;
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+}
+/* =========================================================
+   MOBILE / RESPONSIVE POLISH
+========================================================= */
+
+@media (max-width: 900px) {
+  .navbar-inner {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .nav-location {
+    display: none;
+  }
+
+  .hero-modern {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 45px 20px 35px;
+  }
+
+  .hero-copy {
+    max-width: 700px;
+  }
+
+  .hero-visual {
+    min-height: 360px;
+  }
+
+  .section-modern {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .section-heading {
+    gap: 20px;
+  }
+
+  .featured-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-modern {
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 35px 25px;
+  }
+
+  .detail-page-modern,
+  .explorer-page {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* =========================================================
+   PHONE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  /* NAVBAR */
+
+  .navbar-inner {
+    min-height: 64px;
+    padding: 10px 15px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-inner > button:not(.mobile-button):not(.logo) {
+    font-size: 11px !important;
+    padding: 8px 10px !important;
+  }
+
+  .mobile-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* HERO */
+
+  .hero-modern {
+    padding: 32px 15px 25px;
+    gap: 22px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(38px, 11vw, 52px);
+    line-height: 0.98;
+    margin-top: 10px;
+    margin-bottom: 16px;
+  }
+
+  .hero-copy > p {
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+
+  .hero-visual {
+    min-height: 270px;
+    border-radius: 20px;
+  }
+
+  .hero-visual img {
+    height: 270px;
+  }
+
+  .hero-map-badge {
+    left: 12px;
+    bottom: 12px;
+    padding: 9px 11px;
+    font-size: 12px;
+  }
+
+  .hero-map-badge small {
+    font-size: 10px;
+  }
+
+  /* SEARCH */
+
+  .search-box-modern {
+    width: 100%;
+    padding: 6px;
+    gap: 5px;
+  }
+
+  .search-box-modern input {
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .search-box-modern button {
+    padding: 10px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  /* HERO TAGS */
+
+  .hero-highlights {
+    margin-top: 12px;
+  }
+
+  .hero-highlights span {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  /* SECTIONS */
+
+  .section-modern {
+    padding: 42px 15px;
+  }
+
+  .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .section-heading h2 {
+    font-size: 25px;
+    line-height: 1.15;
+  }
+
+  .section-heading p {
+    font-size: 13px;
+  }
+
+  .section-heading > button {
+    align-self: flex-start;
+  }
+
+  /* FEATURED CARDS */
+
+  .featured-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* CATEGORY CARDS */
+
+  .category-grid-modern {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .category-tile {
+    min-height: 110px;
+    padding: 14px;
+  }
+
+  /* ABOUT */
+
+  .about-modern {
+    margin: 10px 15px 35px;
+    padding: 30px 20px;
+    border-radius: 20px;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .about-modern h2 {
+    font-size: 34px;
+  }
+
+  .about-points {
+    gap: 18px;
+  }
+
+  /* EXPLORER */
+
+  .explorer-page {
+    padding: 35px 15px;
+  }
+
+  .explorer-page h1 {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+
+  .explorer-page > p {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .filter-row {
+    gap: 7px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+  }
+
+  .filter-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-row button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .listing-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  /* DETAIL PAGE */
+
+  .detail-page-modern {
+    padding: 30px 15px;
+  }
+
+  .detail-hero-modern {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .detail-hero-modern h1 {
+    font-size: 34px;
+    line-height: 1.05;
+  }
+
+  .detail-main-photo {
+    min-height: 260px;
+  }
+
+  .detail-layout-modern {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-aside {
+    order: -1;
+  }
+
+  /* FOOTER */
+
+  footer {
+    padding: 30px 15px;
+    text-align: center;
+    gap: 15px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 400px) {
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .logo-mark {
+    width: 29px;
+    height: 29px;
+  }
+
+  .hero-copy h1 {
+    font-size: 38px;
+  }
+
+  .hero-visual,
+  .hero-visual img {
+    height: 230px;
+    min-height: 230px;
+  }
+
+  .search-box-modern button {
+    padding: 10px;
+  }
+
+  .category-tile {
+    min-height: 105px;
+    padding: 12px;
+  }
+
+  .category-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .category-tile > span:not(.category-icon) {
+    font-size: 12px;
+  }
+}
+.logo-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.logo img {
+  width: 39px !important;
+  height: 39px !important;
+  object-fit: contain;
+  display: block;
+}
