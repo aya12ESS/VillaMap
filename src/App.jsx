@@ -106,6 +106,822 @@ function scrollTop() {
 }
 
 /* =========================================================
+   SPLASH SCREEN
+========================================================= */
+
+function SplashScreen() {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        position: "fixed",
+        inset: 0,
+        zIndex: 99999,
+        overflow: "hidden",
+        display: "grid",
+        placeItems: "center",
+        background: "#087bb7",
+      }}
+    >
+      <img
+        src={heroImage}
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          opacity: 0.55,
+          transform: "scale(1.03)",
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(8,123,183,.55), rgba(8,123,183,.82))",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          textAlign: "center",
+          color: "#fff",
+          padding: 24,
+          animation: "villamapSplashIn .8s ease both",
+        }}
+      >
+        <div
+          style={{
+            width: 120,
+            height: 120,
+            margin: "0 auto 24px",
+            borderRadius: 32,
+            background: "rgba(255,255,255,.96)",
+            display: "grid",
+            placeItems: "center",
+            padding: 16,
+            boxShadow:
+              "0 25px 70px rgba(0,0,0,.25)",
+          }}
+        >
+          <img
+            src={logo}
+            alt="VillaMap"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+
+        <h1
+          style={{
+            margin: 0,
+            fontSize: "clamp(36px, 9vw, 58px)",
+            fontWeight: 900,
+            letterSpacing: "-2px",
+          }}
+        >
+          VillaMap
+        </h1>
+
+        <p
+          style={{
+            margin: "12px 0 0",
+            fontSize: 16,
+            fontWeight: 600,
+            opacity: 0.95,
+          }}
+        >
+          Votre ville, à portée de main
+        </p>
+
+        <div
+          style={{
+            width: 42,
+            height: 42,
+            margin: "30px auto 0",
+            borderRadius: "50%",
+            border: "3px solid rgba(255,255,255,.35)",
+            borderTopColor: "#fff",
+            animation: "villamapSpin 1s linear infinite",
+          }}
+        />
+      </div>
+
+      <style>
+        {`
+          @keyframes villamapSplashIn {
+            from {
+              opacity: 0;
+              transform: translateY(15px) scale(.97);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+
+          @keyframes villamapSpin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}
+      </style>
+    </div>
+  );
+}
+
+/* =========================================================
+   ONBOARDING
+========================================================= */
+
+const onboardingSlides = [
+  {
+    icon: "📍",
+    title: "Découvrez Al Hoceima",
+    text: "Explorez les meilleurs endroits de la ville.",
+  },
+  {
+    icon: "✨",
+    title: "Tout au même endroit",
+    text: "Hôtels • Restaurants • Cafés • Activités • Gaming…",
+  },
+  {
+    icon: "💙",
+    title: "Votre ville, vos découvertes",
+    text: "Enregistrez vos endroits préférés et explorez facilement.",
+  },
+];
+
+function OnboardingScreen({ onFinish }) {
+  const [current, setCurrent] = useState(0);
+
+  const slide = onboardingSlides[current];
+  const last = current === onboardingSlides.length - 1;
+
+  function next() {
+    if (last) {
+      onFinish();
+      return;
+    }
+
+    setCurrent((value) => value + 1);
+  }
+
+  function skip() {
+    onFinish();
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(180deg, #f5fbfe 0%, #ffffff 100%)",
+        display: "flex",
+        flexDirection: "column",
+        position: "fixed",
+        inset: 0,
+        zIndex: 99998,
+        overflow: "auto",
+      }}
+    >
+      <div
+        style={{
+          padding: "24px 22px 0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <img
+          src={logo}
+          alt="VillaMap"
+          style={{
+            width: 105,
+            height: 45,
+            objectFit: "contain",
+            objectPosition: "left center",
+          }}
+        />
+
+        <button
+          onClick={skip}
+          style={{
+            border: 0,
+            background: "transparent",
+            color: "#728492",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Passer
+        </button>
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "25px 24px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 430,
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 170,
+              height: 170,
+              margin: "0 auto 35px",
+              borderRadius: 50,
+              background:
+                "linear-gradient(145deg, #eaf7fd, #fff1f6)",
+              display: "grid",
+              placeItems: "center",
+              fontSize: 76,
+              boxShadow:
+                "0 20px 55px rgba(20,153,220,.12)",
+              animation:
+                "villamapOnboardingFloat 3s ease-in-out infinite",
+            }}
+          >
+            {slide.icon}
+          </div>
+
+          <h1
+            style={{
+              margin: 0,
+              color: "#163246",
+              fontSize: "clamp(28px, 7vw, 38px)",
+              lineHeight: 1.1,
+              fontWeight: 900,
+            }}
+          >
+            {slide.title}
+          </h1>
+
+          <p
+            style={{
+              color: "#728492",
+              fontSize: 16,
+              lineHeight: 1.7,
+              margin:
+                "18px auto 0",
+              maxWidth: 360,
+            }}
+          >
+            {slide.text}
+          </p>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "10px 24px 30px",
+          width: "100%",
+          maxWidth: 500,
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 7,
+            marginBottom: 22,
+          }}
+        >
+          {onboardingSlides.map(
+            (_, index) => (
+              <span
+                key={index}
+                style={{
+                  width:
+                    index === current
+                      ? 25
+                      : 8,
+                  height: 8,
+                  borderRadius: 20,
+                  background:
+                    index === current
+                      ? "#1499dc"
+                      : "#d8e8ef",
+                  transition:
+                    "all .25s ease",
+                }}
+              />
+            )
+          )}
+        </div>
+
+        <button
+          onClick={next}
+          style={{
+            width: "100%",
+            border: 0,
+            borderRadius: 17,
+            padding: "16px 20px",
+            background:
+              "linear-gradient(135deg, #1499dc, #087bb7)",
+            color: "#fff",
+            fontSize: 15,
+            fontWeight: 800,
+            boxShadow:
+              "0 12px 30px rgba(20,153,220,.25)",
+            cursor: "pointer",
+          }}
+        >
+          {last
+            ? "Commencer →"
+            : "Suivant →"}
+        </button>
+      </div>
+
+      <style>
+        {`
+          @keyframes villamapOnboardingFloat {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+        `}
+      </style>
+    </div>
+  );
+}
+
+/* =========================================================
+   AUTH SCREEN
+========================================================= */
+
+function AuthScreen({ onSkip, onUserChange }) {
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] =
+    useState(false);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    setMessage("");
+    setSuccess(false);
+
+    if (!email.trim() || !password.trim()) {
+      setMessage(
+        "Veuillez remplir tous les champs."
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage(
+        "Le mot de passe doit contenir au moins 6 caractères."
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      if (mode === "login") {
+        const { data, error } =
+          await supabase.auth.signInWithPassword(
+            {
+              email: email.trim(),
+              password,
+            }
+          );
+
+        if (error) throw error;
+
+        onUserChange?.(data.user);
+      } else {
+        const { data, error } =
+          await supabase.auth.signUp({
+            email: email.trim(),
+            password,
+          });
+
+        if (error) throw error;
+
+        onUserChange?.(data.user);
+
+        setSuccess(true);
+
+        setMessage(
+          data.session
+            ? "Compte créé avec succès ✨"
+            : "Compte créé. Vérifiez votre email si une confirmation est demandée."
+        );
+      }
+    } catch (error) {
+      setMessage(
+        error?.message ||
+          "Une erreur est survenue."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function continueWithGoogle() {
+    setGoogleLoading(true);
+    setMessage("");
+
+    try {
+      const { error } =
+        await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo:
+              window.location.origin,
+          },
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      setMessage(
+        error?.message ||
+          "La connexion Google n'est pas disponible pour le moment."
+      );
+      setGoogleLoading(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(180deg, #f5fbfe 0%, #fff7fa 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        position: "fixed",
+        inset: 0,
+        zIndex: 99997,
+        overflow: "auto",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 430,
+          background: "#fff",
+          borderRadius: 28,
+          padding: "30px 24px 25px",
+          boxShadow:
+            "0 25px 80px rgba(22,50,70,.12)",
+          border:
+            "1px solid rgba(226,237,242,.8)",
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: 26,
+          }}
+        >
+          <div
+            style={{
+              width: 78,
+              height: 78,
+              margin: "0 auto 17px",
+              borderRadius: 23,
+              background: "#f7fbfd",
+              display: "grid",
+              placeItems: "center",
+              padding: 10,
+              border:
+                "1px solid #e2edf2",
+            }}
+          >
+            <img
+              src={logo}
+              alt="VillaMap"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
+          </div>
+
+          <h1
+            style={{
+              margin: 0,
+              color: "#163246",
+              fontSize: 26,
+              fontWeight: 900,
+            }}
+          >
+            Bienvenue sur VillaMap
+          </h1>
+
+          <p
+            style={{
+              margin:
+                "9px auto 0",
+              color: "#728492",
+              lineHeight: 1.5,
+              fontSize: 14,
+            }}
+          >
+            Connectez-vous pour découvrir
+            Al Hoceima.
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            background: "#f5fafc",
+            borderRadius: 13,
+            padding: 4,
+            marginBottom: 20,
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              setMessage("");
+              setSuccess(false);
+            }}
+            style={{
+              flex: 1,
+              border: 0,
+              borderRadius: 10,
+              padding: "10px",
+              background:
+                mode === "login"
+                  ? "#fff"
+                  : "transparent",
+              color:
+                mode === "login"
+                  ? "#087bb7"
+                  : "#728492",
+              fontWeight: 800,
+              boxShadow:
+                mode === "login"
+                  ? "0 3px 10px rgba(22,50,70,.07)"
+                  : "none",
+              cursor: "pointer",
+            }}
+          >
+            Connexion
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMode("signup");
+              setMessage("");
+              setSuccess(false);
+            }}
+            style={{
+              flex: 1,
+              border: 0,
+              borderRadius: 10,
+              padding: "10px",
+              background:
+                mode === "signup"
+                  ? "#fff"
+                  : "transparent",
+              color:
+                mode === "signup"
+                  ? "#087bb7"
+                  : "#728492",
+              fontWeight: 800,
+              boxShadow:
+                mode === "signup"
+                  ? "0 3px 10px rgba(22,50,70,.07)"
+                  : "none",
+              cursor: "pointer",
+            }}
+          >
+            Inscription
+          </button>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "grid",
+            gap: 12,
+          }}
+        >
+          <input
+            type="email"
+            placeholder="Votre email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            autoComplete="email"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding:
+                "14px 15px",
+              border:
+                "1px solid #e2edf2",
+              borderRadius: 13,
+              outline: "none",
+              fontSize: 14,
+              background: "#fff",
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            autoComplete={
+              mode === "login"
+                ? "current-password"
+                : "new-password"
+            }
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding:
+                "14px 15px",
+              border:
+                "1px solid #e2edf2",
+              borderRadius: 13,
+              outline: "none",
+              fontSize: 14,
+              background: "#fff",
+            }}
+          />
+
+          {message && (
+            <div
+              style={{
+                padding: 12,
+                borderRadius: 12,
+                background: success
+                  ? "#eefaf5"
+                  : "#fff3f4",
+                color: success
+                  ? "#27785b"
+                  : "#b34f5a",
+                fontSize: 13,
+                lineHeight: 1.5,
+              }}
+            >
+              {message}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              border: 0,
+              borderRadius: 13,
+              padding: "14px",
+              background:
+                "linear-gradient(135deg, #1499dc, #087bb7)",
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: 14,
+              opacity: loading ? 0.65 : 1,
+              cursor: loading
+                ? "wait"
+                : "pointer",
+              boxShadow:
+                "0 10px 25px rgba(20,153,220,.2)",
+            }}
+          >
+            {loading
+              ? "Chargement..."
+              : mode === "login"
+              ? "Se connecter"
+              : "Créer mon compte"}
+          </button>
+        </form>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            margin: "19px 0",
+            color: "#9aaab3",
+            fontSize: 12,
+          }}
+        >
+          <span
+            style={{
+              flex: 1,
+              height: 1,
+              background: "#e7eef2",
+            }}
+          />
+
+          <span>ou</span>
+
+          <span
+            style={{
+              flex: 1,
+              height: 1,
+              background: "#e7eef2",
+            }}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={continueWithGoogle}
+          disabled={googleLoading}
+          style={{
+            width: "100%",
+            border:
+              "1px solid #e2edf2",
+            background: "#fff",
+            color: "#163246",
+            padding: "13px",
+            borderRadius: 13,
+            fontWeight: 750,
+            cursor: googleLoading
+              ? "wait"
+              : "pointer",
+            opacity: googleLoading
+              ? 0.65
+              : 1,
+          }}
+        >
+          {googleLoading
+            ? "Connexion..."
+            : "🌐 Continuer avec Google"}
+        </button>
+
+        <button
+          type="button"
+          onClick={onSkip}
+          style={{
+            width: "100%",
+            border: 0,
+            background: "transparent",
+            color: "#1499dc",
+            padding: "14px 8px 5px",
+            fontWeight: 800,
+            cursor: "pointer",
+          }}
+        >
+          Passer pour le moment
+        </button>
+
+        <p
+          style={{
+            margin:
+              "12px 0 0",
+            textAlign: "center",
+            fontSize: 11,
+            color: "#9aaab3",
+            lineHeight: 1.5,
+          }}
+        >
+          Vous pourrez vous connecter plus tard
+          pour utiliser les favoris et les avis.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
    AUTH MODAL
 ========================================================= */
 
@@ -140,10 +956,11 @@ function AuthModal({ onClose, onUserChange }) {
         onUserChange?.(data.user);
         onClose();
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const { data, error } =
+          await supabase.auth.signUp({
+            email,
+            password,
+          });
 
         if (error) throw error;
 
@@ -154,7 +971,10 @@ function AuthModal({ onClose, onUserChange }) {
         );
       }
     } catch (error) {
-      setMessage(error.message || "Une erreur est survenue.");
+      setMessage(
+        error.message ||
+          "Une erreur est survenue."
+      );
     } finally {
       setLoading(false);
     }
@@ -193,7 +1013,9 @@ function AuthModal({ onClose, onUserChange }) {
           }}
         >
           <div>
-            <span className="page-kicker">VILLAMAP</span>
+            <span className="page-kicker">
+              VILLAMAP
+            </span>
 
             <h2>
               {mode === "login"
@@ -228,7 +1050,9 @@ function AuthModal({ onClose, onUserChange }) {
             type="email"
             placeholder="Votre email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
             style={{
               padding: "13px 14px",
               border: "1px solid #e2edf2",
@@ -241,7 +1065,9 @@ function AuthModal({ onClose, onUserChange }) {
             type="password"
             placeholder="Mot de passe"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
             style={{
               padding: "13px 14px",
               border: "1px solid #e2edf2",
@@ -284,7 +1110,11 @@ function AuthModal({ onClose, onUserChange }) {
 
         <button
           onClick={() => {
-            setMode(mode === "login" ? "signup" : "login");
+            setMode(
+              mode === "login"
+                ? "signup"
+                : "login"
+            );
             setMessage("");
           }}
           style={{
@@ -432,7 +1262,9 @@ function Navbar({
         )}
 
         <button
-          onClick={user ? logout : onAuth}
+          onClick={
+            user ? logout : onAuth
+          }
           style={{
             border: 0,
             background: "#eaf7fd",
@@ -443,12 +1275,16 @@ function Navbar({
             fontSize: 12,
           }}
         >
-          {user ? "Déconnexion" : "Connexion"}
+          {user
+            ? "Déconnexion"
+            : "Connexion"}
         </button>
 
         <button
           className="mobile-button"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() =>
+            setMenuOpen(!menuOpen)
+          }
           aria-label="Menu"
         >
           {menuOpen ? "×" : "☰"}
@@ -482,7 +1318,9 @@ function SearchBox({
 
       <input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) =>
+          onChange(e.target.value)
+        }
         placeholder="Rechercher un lieu à Al Hoceima..."
         aria-label="Rechercher un lieu à Al Hoceima"
       />
@@ -498,12 +1336,16 @@ function SearchBox({
    CATEGORY GRID
 ========================================================= */
 
-function CategoryGrid({ onCategory, data }) {
+function CategoryGrid({
+  onCategory,
+  data,
+}) {
   return (
     <div className="category-grid-modern">
       {categories.map((category) => {
         const count =
-          data?.[category.id]?.length || 0;
+          data?.[category.id]?.length ||
+          0;
 
         return (
           <button
@@ -532,18 +1374,24 @@ function CategoryGrid({ onCategory, data }) {
    FAVORITES
 ========================================================= */
 
-function FavoriteButton({ item, type }) {
+function FavoriteButton({
+  item,
+  type,
+}) {
   const key = `villamap-favorite-${type}-${item.id}`;
 
-  const [favorite, setFavorite] = useState(
-    () => {
+  const [favorite, setFavorite] =
+    useState(() => {
       try {
-        return localStorage.getItem(key) === "true";
+        return (
+          localStorage.getItem(
+            key
+          ) === "true"
+        );
       } catch {
         return false;
       }
-    }
-  );
+    });
 
   function toggle(e) {
     e.stopPropagation();
@@ -553,7 +1401,10 @@ function FavoriteButton({ item, type }) {
     setFavorite(next);
 
     try {
-      localStorage.setItem(key, String(next));
+      localStorage.setItem(
+        key,
+        String(next)
+      );
     } catch {
       // Ignore localStorage errors
     }
@@ -586,7 +1437,10 @@ function PlaceCard({
   type,
   onClick,
 }) {
-  const rating = Number(item.rating || 0);
+  const rating = Number(
+    item.rating || 0
+  );
+
   const placeName =
     item.name || "Lieu sans nom";
 
@@ -596,7 +1450,10 @@ function PlaceCard({
   }
 
   function handleKeyDown(e) {
-    if (e.key === "Enter" || e.key === " ") {
+    if (
+      e.key === "Enter" ||
+      e.key === " "
+    ) {
       e.preventDefault();
       open();
     }
@@ -625,7 +1482,10 @@ function PlaceCard({
         }}
       >
         <span className="rating-pill">
-          ⭐ {rating ? rating.toFixed(1) : "N/A"}
+          ⭐{" "}
+          {rating
+            ? rating.toFixed(1)
+            : "N/A"}
         </span>
 
         <FavoriteButton
@@ -654,7 +1514,8 @@ function PlaceCard({
               marginTop: 6,
             }}
           >
-            {item.description.length > 90
+            {item.description.length >
+            90
               ? `${item.description.slice(
                   0,
                   90
@@ -663,16 +1524,26 @@ function PlaceCard({
           </p>
         )}
 
-        {Array.isArray(item.services) &&
-          item.services.length > 0 && (
+        {Array.isArray(
+          item.services
+        ) &&
+          item.services.length >
+            0 && (
             <div className="tags">
               {item.services
                 .slice(0, 3)
-                .map((service, index) => (
-                  <span key={index}>
-                    {service}
-                  </span>
-                ))}
+                .map(
+                  (
+                    service,
+                    index
+                  ) => (
+                    <span
+                      key={index}
+                    >
+                      {service}
+                    </span>
+                  )
+                )}
             </div>
           )}
 
@@ -702,21 +1573,29 @@ function ReviewsSection({
 }) {
   const placeId = `${type}-${item.id}`;
 
-  const [reviews, setReviews] = useState([]);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [reviews, setReviews] =
+    useState([]);
+
+  const [rating, setRating] =
+    useState(5);
+
+  const [comment, setComment] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
 
   async function loadReviews() {
-    const { data, error } = await supabase
-      .from("reviews")
-      .select(
-        "id, place_id, user_id, rating, comment, created_at"
-      )
-      .eq("place_id", placeId)
-      .order("created_at", {
-        ascending: false,
-      });
+    const { data, error } =
+      await supabase
+        .from("reviews")
+        .select(
+          "id, place_id, user_id, rating, comment, created_at"
+        )
+        .eq("place_id", placeId)
+        .order("created_at", {
+          ascending: false,
+        });
 
     if (!error) {
       setReviews(data || []);
@@ -749,14 +1628,16 @@ function ReviewsSection({
 
     setLoading(true);
 
-    const { error } = await supabase
-      .from("reviews")
-      .insert({
-        place_id: placeId,
-        user_id: user.id,
-        rating,
-        comment: comment.trim(),
-      });
+    const { error } =
+      await supabase
+        .from("reviews")
+        .insert({
+          place_id: placeId,
+          user_id: user.id,
+          rating,
+          comment:
+            comment.trim(),
+        });
 
     if (!error) {
       setComment("");
@@ -773,7 +1654,10 @@ function ReviewsSection({
     reviews.length > 0
       ? reviews.reduce(
           (sum, review) =>
-            sum + Number(review.rating || 0),
+            sum +
+            Number(
+              review.rating || 0
+            ),
           0
         ) / reviews.length
       : 0;
@@ -810,7 +1694,9 @@ function ReviewsSection({
           }}
         >
           {"★".repeat(
-            Math.round(average || 0)
+            Math.round(
+              average || 0
+            )
           )}
           {"☆".repeat(
             Math.max(
@@ -836,8 +1722,8 @@ function ReviewsSection({
           }}
         >
           Aucun avis pour le moment.
-          Soyez le premier à donner votre
-          avis !
+          Soyez le premier à donner
+          votre avis !
         </p>
       ) : (
         <div
@@ -847,51 +1733,54 @@ function ReviewsSection({
             marginBottom: 24,
           }}
         >
-          {reviews.map((review) => (
-            <div
-              key={review.id}
-              style={{
-                borderTop:
-                  "1px solid #e2edf2",
-                paddingTop: 14,
-              }}
-            >
+          {reviews.map(
+            (review) => (
               <div
+                key={review.id}
                 style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  gap: 10,
+                  borderTop:
+                    "1px solid #e2edf2",
+                  paddingTop: 14,
                 }}
               >
-                <strong>
-                  ⭐{" "}
-                  {Number(
-                    review.rating
-                  ).toFixed(0)}
-                  /5
-                </strong>
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    justifyContent:
+                      "space-between",
+                    gap: 10,
+                  }}
+                >
+                  <strong>
+                    ⭐{" "}
+                    {Number(
+                      review.rating
+                    ).toFixed(0)}
+                    /5
+                  </strong>
 
-                <small className="muted">
-                  {review.created_at
-                    ? new Date(
-                        review.created_at
-                      ).toLocaleDateString(
-                        "fr-FR"
-                      )
-                    : ""}
-                </small>
+                  <small className="muted">
+                    {review.created_at
+                      ? new Date(
+                          review.created_at
+                        ).toLocaleDateString(
+                          "fr-FR"
+                        )
+                      : ""}
+                  </small>
+                </div>
+
+                <p
+                  style={{
+                    marginTop: 5,
+                  }}
+                >
+                  {review.comment}
+                </p>
               </div>
-
-              <p
-                style={{
-                  marginTop: 5,
-                }}
-              >
-                {review.comment}
-              </p>
-            </div>
-          ))}
+            )
+          )}
         </div>
       )}
 
@@ -918,7 +1807,9 @@ function ReviewsSection({
             value={rating}
             onChange={(e) =>
               setRating(
-                Number(e.target.value)
+                Number(
+                  e.target.value
+                )
               )
             }
             style={{
@@ -954,7 +1845,9 @@ function ReviewsSection({
         <textarea
           value={comment}
           onChange={(e) =>
-            setComment(e.target.value)
+            setComment(
+              e.target.value
+            )
           }
           placeholder={
             user
@@ -1016,23 +1909,33 @@ function ReviewsSection({
    PLACE PHOTOS
 ========================================================= */
 
-function PlacePhotos({ item, user, onAuth }) {
-  const [photos, setPhotos] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState("");
+function PlacePhotos({
+  item,
+  user,
+  onAuth,
+}) {
+  const [photos, setPhotos] =
+    useState([]);
+
+  const [uploading, setUploading] =
+    useState(false);
+
+  const [message, setMessage] =
+    useState("");
 
   const placeId = item.id;
 
   async function loadPhotos() {
-    const { data, error } = await supabase
-      .from("restaurant_photos")
-      .select(
-        "id, place_id, image_url, created_at"
-      )
-      .eq("place_id", placeId)
-      .order("created_at", {
-        ascending: false,
-      });
+    const { data, error } =
+      await supabase
+        .from("restaurant_photos")
+        .select(
+          "id, place_id, image_url, created_at"
+        )
+        .eq("place_id", placeId)
+        .order("created_at", {
+          ascending: false,
+        });
 
     if (error) {
       console.error(
@@ -1049,7 +1952,9 @@ function PlacePhotos({ item, user, onAuth }) {
     loadPhotos();
   }, [placeId]);
 
-  async function handleUpload(event) {
+  async function handleUpload(
+    event
+  ) {
     const file =
       event.target.files?.[0];
 
@@ -1061,7 +1966,11 @@ function PlacePhotos({ item, user, onAuth }) {
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
+    if (
+      !file.type.startsWith(
+        "image/"
+      )
+    ) {
       setMessage(
         "Veuillez choisir une image."
       );
@@ -1069,7 +1978,10 @@ function PlacePhotos({ item, user, onAuth }) {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (
+      file.size >
+      5 * 1024 * 1024
+    ) {
       setMessage(
         "La photo doit faire moins de 5 MB."
       );
@@ -1094,10 +2006,14 @@ function PlacePhotos({ item, user, onAuth }) {
         error: uploadError,
       } = await supabase.storage
         .from("restaurant-photos")
-        .upload(fileName, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+        .upload(
+          fileName,
+          file,
+          {
+            cacheControl: "3600",
+            upsert: false,
+          }
+        );
 
       if (uploadError) {
         throw uploadError;
@@ -1107,7 +2023,9 @@ function PlacePhotos({ item, user, onAuth }) {
         data: publicUrlData,
       } = supabase.storage
         .from("restaurant-photos")
-        .getPublicUrl(fileName);
+        .getPublicUrl(
+          fileName
+        );
 
       const imageUrl =
         publicUrlData.publicUrl;
@@ -1118,7 +2036,8 @@ function PlacePhotos({ item, user, onAuth }) {
         .from("restaurant_photos")
         .insert({
           place_id: placeId,
-          image_url: imageUrl,
+          image_url:
+            imageUrl,
         });
 
       if (insertError) {
@@ -1151,7 +2070,8 @@ function PlacePhotos({ item, user, onAuth }) {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent:
+            "space-between",
           alignItems: "center",
           gap: 12,
           flexWrap: "wrap",
@@ -1183,7 +2103,8 @@ function PlacePhotos({ item, user, onAuth }) {
             cursor: uploading
               ? "wait"
               : "pointer",
-            opacity: uploading ? 0.7 : 1,
+            opacity:
+              uploading ? 0.7 : 1,
           }}
         >
           {uploading
@@ -1224,20 +2145,24 @@ function PlacePhotos({ item, user, onAuth }) {
             marginTop: 18,
           }}
         >
-          {photos.map((photo) => (
-            <img
-              key={photo.id}
-              src={photo.image_url}
-              alt={`Photo de ${item.name} à Al Hoceima`}
-              style={{
-                width: "100%",
-                height: 180,
-                objectFit: "cover",
-                borderRadius: 16,
-                display: "block",
-              }}
-            />
-          ))}
+          {photos.map(
+            (photo) => (
+              <img
+                key={photo.id}
+                src={
+                  photo.image_url
+                }
+                alt={`Photo de ${item.name} à Al Hoceima`}
+                style={{
+                  width: "100%",
+                  height: 180,
+                  objectFit: "cover",
+                  borderRadius: 16,
+                  display: "block",
+                }}
+              />
+            )
+          )}
         </div>
       ) : (
         <div
@@ -1268,19 +2193,27 @@ function DetailPage({
   user,
   onAuth,
 }) {
-  const image = getImage(item, type);
+  const image = getImage(
+    item,
+    type
+  );
 
   const rating = Number(
     item.rating || 0
   );
 
   const services =
-    Array.isArray(item.services)
+    Array.isArray(
+      item.services
+    )
       ? item.services
-      : typeof item.services === "string"
+      : typeof item.services ===
+        "string"
       ? item.services
           .split(",")
-          .map((x) => x.trim())
+          .map((x) =>
+            x.trim()
+          )
           .filter(Boolean)
       : [];
 
@@ -1322,7 +2255,9 @@ function DetailPage({
 
             <span>
               {"★".repeat(
-                Math.round(rating)
+                Math.round(
+                  rating
+                )
               )}
               {"☆".repeat(
                 Math.max(
@@ -1336,7 +2271,9 @@ function DetailPage({
             </span>
 
             <small>
-              {item.reviews || 0} avis
+              {item.reviews ||
+                0}{" "}
+              avis
             </small>
           </div>
 
@@ -1392,33 +2329,17 @@ function DetailPage({
           </div>
 
           <div className="detail-thumbs">
-            <div
-              aria-hidden="true"
-              style={{
-                backgroundImage: `url("${image}")`,
-              }}
-            />
-
-            <div
-              aria-hidden="true"
-              style={{
-                backgroundImage: `url("${image}")`,
-              }}
-            />
-
-            <div
-              aria-hidden="true"
-              style={{
-                backgroundImage: `url("${image}")`,
-              }}
-            />
-
-            <div
-              aria-hidden="true"
-              style={{
-                backgroundImage: `url("${image}")`,
-              }}
-            />
+            {[1, 2, 3, 4].map(
+              (number) => (
+                <div
+                  key={number}
+                  aria-hidden="true"
+                  style={{
+                    backgroundImage: `url("${image}")`,
+                  }}
+                />
+              )
+            )}
           </div>
         </div>
       </section>
@@ -1490,7 +2411,8 @@ function DetailPage({
             </div>
           </section>
 
-          {services.length > 0 && (
+          {services.length >
+            0 && (
             <section className="detail-card-modern">
               <h2>
                 Services
@@ -1498,8 +2420,13 @@ function DetailPage({
 
               <div className="service-chips">
                 {services.map(
-                  (service, index) => (
-                    <span key={index}>
+                  (
+                    service,
+                    index
+                  ) => (
+                    <span
+                      key={index}
+                    >
                       {service}
                     </span>
                   )
@@ -1520,10 +2447,15 @@ function DetailPage({
                     item.rooms
                   ) &&
                     item.rooms.map(
-                      (room, index) => (
+                      (
+                        room,
+                        index
+                      ) => (
                         <div
                           className="room-card"
-                          key={index}
+                          key={
+                            index
+                          }
                         >
                           <span>
                             🛏️
@@ -1568,12 +2500,13 @@ function DetailPage({
             </span>
 
             <strong>
-              {item.price || "Sur demande"}
+              {item.price ||
+                "Sur demande"}
             </strong>
 
             <small>
-              Les prix peuvent varier selon
-              les disponibilités.
+              Les prix peuvent varier
+              selon les disponibilités.
             </small>
 
             <button
@@ -1672,14 +2605,18 @@ function ExplorerPage({
   const allPlaces = useMemo(() => {
     const result = [];
 
-    Object.entries(placesData).forEach(
+    Object.entries(
+      placesData
+    ).forEach(
       ([type, places]) => {
-        places.forEach((place) => {
-          result.push({
-            ...place,
-            _type: type,
-          });
-        });
+        places.forEach(
+          (place) => {
+            result.push({
+              ...place,
+              _type: type,
+            });
+          }
+        );
       }
     );
 
@@ -1690,37 +2627,56 @@ function ExplorerPage({
     currentCategory === "all"
       ? allPlaces
       : (
-          placesData[currentCategory] ||
-          []
+          placesData[
+            currentCategory
+          ] || []
         ).map((place) => ({
           ...place,
-          _type: currentCategory,
+          _type:
+            currentCategory,
         }));
 
   const filters = useMemo(() => {
     const tags = new Set();
 
-    categoriesToShow.forEach((place) => {
-      if (Array.isArray(place.services)) {
-        place.services.forEach((service) =>
-          tags.add(service)
-        );
-      }
+    categoriesToShow.forEach(
+      (place) => {
+        if (
+          Array.isArray(
+            place.services
+          )
+        ) {
+          place.services.forEach(
+            (service) =>
+              tags.add(service)
+          );
+        }
 
-      if (Array.isArray(place.tags)) {
-        place.tags.forEach((tag) =>
-          tags.add(tag)
-        );
+        if (
+          Array.isArray(
+            place.tags
+          )
+        ) {
+          place.tags.forEach(
+            (tag) =>
+              tags.add(tag)
+          );
+        }
       }
-    });
+    );
 
     return [
       "Tous",
-      ...Array.from(tags).slice(0, 8),
+      ...Array.from(tags).slice(
+        0,
+        8
+      ),
     ];
   }, [categoriesToShow]);
 
-  const normalizeText = (value) =>
+  const normalizeText = (
+    value
+  ) =>
     String(value || "")
       .toLowerCase()
       .normalize("NFD")
@@ -1730,65 +2686,84 @@ function ExplorerPage({
       )
       .trim();
 
-  const filtered = categoriesToShow.filter(
-    (place) => {
-      const searchText =
-        normalizeText(search);
+  const filtered =
+    categoriesToShow.filter(
+      (place) => {
+        const searchText =
+          normalizeText(search);
 
-      const searchableText =
-        normalizeText(
-          [
-            place.name,
-            place.title,
-            place.address,
-            place.location,
-            place.description,
-            place.category,
-            place.type,
-            place._type,
-            place.phone,
-            place.email,
-            Array.isArray(place.services)
-              ? place.services.join(" ")
-              : place.services,
-            Array.isArray(place.tags)
-              ? place.tags.join(" ")
-              : place.tags,
-          ]
-            .filter(Boolean)
-            .join(" ")
-        );
-
-      const matchesSearch =
-        !searchText ||
-        searchableText.includes(
-          searchText
-        );
-
-      const matchesFilter =
-        activeFilter === "Tous" ||
-        (Array.isArray(place.services) &&
-          place.services.some(
-            (service) =>
-              normalizeText(service) ===
-              normalizeText(
-                activeFilter
+        const searchableText =
+          normalizeText(
+            [
+              place.name,
+              place.title,
+              place.address,
+              place.location,
+              place.description,
+              place.category,
+              place.type,
+              place._type,
+              place.phone,
+              place.email,
+              Array.isArray(
+                place.services
               )
-          )) ||
-        (Array.isArray(place.tags) &&
-          place.tags.some(
-            (tag) =>
-              normalizeText(tag) ===
-              normalizeText(
-                activeFilter
+                ? place.services.join(
+                    " "
+                  )
+                : place.services,
+              Array.isArray(
+                place.tags
               )
-          ));
+                ? place.tags.join(
+                    " "
+                  )
+                : place.tags,
+            ]
+              .filter(Boolean)
+              .join(" ")
+          );
 
-      return (
-        matchesSearch && matchesFilter
-      );
-    }
-  );
+        const matchesSearch =
+          !searchText ||
+          searchableText.includes(
+            searchText
+          );
+
+        const matchesFilter =
+          activeFilter ===
+            "Tous" ||
+          (Array.isArray(
+            place.services
+          ) &&
+            place.services.some(
+              (service) =>
+                normalizeText(
+                  service
+                ) ===
+                normalizeText(
+                  activeFilter
+                )
+            )) ||
+          (Array.isArray(
+            place.tags
+          ) &&
+            place.tags.some(
+              (tag) =>
+                normalizeText(
+                  tag
+                ) ===
+                normalizeText(
+                  activeFilter
+                )
+            ));
+
+        return (
+          matchesSearch &&
+          matchesFilter
+        );
+      }
+    );
 
   return (
     <main className="explorer-page">
@@ -1801,9 +2776,11 @@ function ExplorerPage({
       </h1>
 
       <p>
-        Hôtels, restaurants, cafés,
-        pharmacies, activités, gaming,
-        shopping et services à Al Hoceima.
+        Hôtels, restaurants,
+        cafés, pharmacies,
+        activités, gaming,
+        shopping et services à
+        Al Hoceima.
       </p>
 
       <SearchBox
@@ -1816,79 +2793,99 @@ function ExplorerPage({
       <div className="filter-row">
         <button
           className={
-            currentCategory === "all"
+            currentCategory ===
+            "all"
               ? "active"
               : ""
           }
           onClick={() => {
-            setSelectedCategory("all");
-            setActiveFilter("Tous");
+            setSelectedCategory(
+              "all"
+            );
+            setActiveFilter(
+              "Tous"
+            );
           }}
         >
           Tout
         </button>
 
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            className={
-              currentCategory ===
-              category.id
-                ? "active"
-                : ""
-            }
-            onClick={() => {
-              setSelectedCategory(
+        {categories.map(
+          (category) => (
+            <button
+              key={category.id}
+              className={
+                currentCategory ===
                 category.id
-              );
-              setActiveFilter("Tous");
-            }}
-          >
-            {category.icon}{" "}
-            {category.name}
-          </button>
-        ))}
+                  ? "active"
+                  : ""
+              }
+              onClick={() => {
+                setSelectedCategory(
+                  category.id
+                );
+                setActiveFilter(
+                  "Tous"
+                );
+              }}
+            >
+              {category.icon}{" "}
+              {category.name}
+            </button>
+          )
+        )}
       </div>
 
       {filters.length > 1 && (
         <div className="filter-row">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              className={
-                activeFilter === filter
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setActiveFilter(filter)
-              }
-            >
-              {filter}
-            </button>
-          ))}
+          {filters.map(
+            (filter) => (
+              <button
+                key={filter}
+                className={
+                  activeFilter ===
+                  filter
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setActiveFilter(
+                    filter
+                  )
+                }
+              >
+                {filter}
+              </button>
+            )
+          )}
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {filtered.length ===
+      0 ? (
         <EmptyResults
           search={search}
           category={
-            currentCategory === "all"
+            currentCategory ===
+            "all"
               ? "hotels"
               : currentCategory
           }
         />
       ) : (
         <div className="listing-grid">
-          {filtered.map((place) => (
-            <PlaceCard
-              key={`${place._type}-${place.id}`}
-              item={place}
-              type={place._type}
-              onClick={onPlace}
-            />
-          ))}
+          {filtered.map(
+            (place) => (
+              <PlaceCard
+                key={`${place._type}-${place.id}`}
+                item={place}
+                type={
+                  place._type
+                }
+                onClick={onPlace}
+              />
+            )
+          )}
         </div>
       )}
     </main>
@@ -1927,10 +2924,6 @@ function HomePage({
 
   return (
     <>
-      {/* =====================================================
-          HERO
-      ===================================================== */}
-
       <main className="hero-modern">
         <div className="hero-copy">
           <span className="page-kicker">
@@ -1944,11 +2937,14 @@ function HomePage({
           </h1>
 
           <p>
-            Explorez Al Hoceima avec VillaMap :
-            découvrez les meilleurs hôtels,
-            restaurants, cafés, pharmacies,
-            activités, gaming et services locaux
-            au cœur du Maroc méditerranéen.
+            Explorez Al Hoceima
+            avec VillaMap :
+            découvrez les meilleurs
+            hôtels, restaurants,
+            cafés, pharmacies,
+            activités, gaming et
+            services locaux au cœur
+            du Maroc méditerranéen.
           </p>
 
           <SearchBox
@@ -1986,10 +2982,6 @@ function HomePage({
         </div>
       </main>
 
-      {/* =====================================================
-          CATEGORIES
-      ===================================================== */}
-
       <section className="section-modern">
         <div className="section-heading">
           <div>
@@ -2002,10 +2994,13 @@ function HomePage({
             </h2>
 
             <p>
-              Découvrez les hôtels, restaurants,
-              cafés, pharmacies, activités, gaming,
-              shopping et autres services disponibles
-              à Al Hoceima avec VillaMap.
+              Découvrez les hôtels,
+              restaurants, cafés,
+              pharmacies, activités,
+              gaming, shopping et
+              autres services
+              disponibles à Al Hoceima
+              avec VillaMap.
             </p>
           </div>
 
@@ -2025,10 +3020,6 @@ function HomePage({
         />
       </section>
 
-      {/* =====================================================
-          RESTAURANTS
-      ===================================================== */}
-
       {featuredRestaurants.length >
         0 && (
         <section className="section-modern soft">
@@ -2043,10 +3034,12 @@ function HomePage({
               </h2>
 
               <p>
-                Découvrez une sélection de restaurants
-                à Al Hoceima, avec leurs adresses,
-                informations pratiques, avis et
-                localisation sur VillaMap.
+                Découvrez une sélection
+                de restaurants à Al Hoceima,
+                avec leurs adresses,
+                informations pratiques,
+                avis et localisation sur
+                VillaMap.
               </p>
             </div>
 
@@ -2076,11 +3069,8 @@ function HomePage({
         </section>
       )}
 
-      {/* =====================================================
-          HOTELS
-      ===================================================== */}
-
-      {featuredHotels.length > 0 && (
+      {featuredHotels.length >
+        0 && (
         <section className="section-modern">
           <div className="section-heading">
             <div>
@@ -2093,10 +3083,12 @@ function HomePage({
               </h2>
 
               <p>
-                Découvrez les hôtels et hébergements
-                à Al Hoceima, avec leurs informations
-                pratiques, avis, photos et
-                localisation sur VillaMap.
+                Découvrez les hôtels et
+                hébergements à Al Hoceima,
+                avec leurs informations
+                pratiques, avis, photos
+                et localisation sur
+                VillaMap.
               </p>
             </div>
 
@@ -2124,11 +3116,8 @@ function HomePage({
         </section>
       )}
 
-      {/* =====================================================
-          GAMING
-      ===================================================== */}
-
-      {featuredGaming.length > 0 && (
+      {featuredGaming.length >
+        0 && (
         <section className="section-modern soft">
           <div className="section-heading">
             <div>
@@ -2141,10 +3130,11 @@ function HomePage({
               </h2>
 
               <p>
-                Découvrez les espaces gaming à
-                Al Hoceima : PlayStation, PC gaming
-                et lieux dédiés aux jeux vidéo
-                pour jouer et se divertir.
+                Découvrez les espaces
+                gaming à Al Hoceima :
+                PlayStation, PC gaming
+                et lieux dédiés aux jeux
+                vidéo.
               </p>
             </div>
 
@@ -2172,10 +3162,6 @@ function HomePage({
         </section>
       )}
 
-      {/* =====================================================
-          ABOUT
-      ===================================================== */}
-
       <section
         className="about-modern"
         id="about"
@@ -2192,14 +3178,20 @@ function HomePage({
           </h2>
 
           <p>
-            VillaMap est un guide local dédié à
-            Al Hoceima, au Maroc. Explorez
-            facilement les hôtels, restaurants,
-            cafés, pharmacies, activités, gaming,
-            shopping et autres services de la ville.
-            Consultez les adresses, photos, avis et
-            informations pratiques, puis localisez
-            facilement chaque endroit sur Google Maps.
+            VillaMap est un guide
+            local dédié à Al Hoceima,
+            au Maroc. Explorez
+            facilement les hôtels,
+            restaurants, cafés,
+            pharmacies, activités,
+            gaming, shopping et
+            autres services de la
+            ville. Consultez les
+            adresses, photos, avis et
+            informations pratiques,
+            puis localisez facilement
+            chaque endroit sur Google
+            Maps.
           </p>
         </div>
 
@@ -2212,8 +3204,8 @@ function HomePage({
             </strong>
 
             <span>
-              Recherchez rapidement les lieux et
-              services à Al Hoceima.
+              Recherchez rapidement les
+              lieux et services à Al Hoceima.
             </span>
           </div>
 
@@ -2225,8 +3217,9 @@ function HomePage({
             </strong>
 
             <span>
-              Consultez les notes et avis pour mieux
-              connaître les établissements.
+              Consultez les notes et avis
+              pour mieux connaître les
+              établissements.
             </span>
           </div>
 
@@ -2238,8 +3231,8 @@ function HomePage({
             </strong>
 
             <span>
-              Ouvrez directement les lieux
-              dans Google Maps.
+              Ouvrez directement les
+              lieux dans Google Maps.
             </span>
           </div>
         </div>
@@ -2261,13 +3254,14 @@ function Footer() {
         </strong>
 
         <p>
-          Votre guide local à Al Hoceima.
+          Votre guide local à
+          Al Hoceima.
         </p>
       </div>
 
       <small>
-        © {new Date().getFullYear()} VillaMap
-        · Al Hoceima, Maroc
+        © {new Date().getFullYear()}{" "}
+        VillaMap · Al Hoceima, Maroc
       </small>
     </footer>
   );
@@ -2290,11 +3284,15 @@ function normalizePlace(place) {
     hôtel: "hotels",
     hôtels: "hotels",
 
-    restaurant: "restaurants",
-    restaurants: "restaurants",
+    restaurant:
+      "restaurants",
+    restaurants:
+      "restaurants",
 
-    pharmacie: "pharmacies",
-    pharmacies: "pharmacies",
+    pharmacie:
+      "pharmacies",
+    pharmacies:
+      "pharmacies",
 
     cafe: "cafes",
     cafés: "cafes",
@@ -2308,17 +3306,24 @@ function normalizePlace(place) {
 
     shopping: "shopping",
 
-    activité: "activities",
-    activités: "activities",
-    activites: "activities",
-    activity: "activities",
-    activities: "activities",
+    activité:
+      "activities",
+    activités:
+      "activities",
+    activites:
+      "activities",
+    activity:
+      "activities",
+    activities:
+      "activities",
 
-    transport: "transport",
+    transport:
+      "transport",
   };
 
   category =
-    aliases[category] || category;
+    aliases[category] ||
+    category;
 
   return {
     ...place,
@@ -2363,23 +3368,32 @@ function AdminPage({
   onPlacesUpdated,
   onBack,
 }) {
-  const [search, setSearch] = useState("");
-  const [uploadingId, setUploadingId] =
-    useState(null);
+  const [search, setSearch] =
+    useState("");
+
+  const [
+    uploadingId,
+    setUploadingId,
+  ] = useState(null);
+
   const [message, setMessage] =
     useState("");
 
   const allPlaces = useMemo(() => {
     const result = [];
 
-    Object.entries(placesData).forEach(
+    Object.entries(
+      placesData
+    ).forEach(
       ([type, places]) => {
-        places.forEach((place) => {
-          result.push({
-            ...place,
-            _type: type,
-          });
-        });
+        places.forEach(
+          (place) => {
+            result.push({
+              ...place,
+              _type: type,
+            });
+          }
+        );
       }
     );
 
@@ -2387,16 +3401,20 @@ function AdminPage({
   }, [placesData]);
 
   const filteredPlaces =
-    allPlaces.filter((place) => {
-      const text =
-        `${place.name || ""} ${
-          place.address || ""
-        } ${place._type || ""}`.toLowerCase();
+    allPlaces.filter(
+      (place) => {
+        const text =
+          `${place.name || ""} ${
+            place.address || ""
+          } ${
+            place._type || ""
+          }`.toLowerCase();
 
-      return text.includes(
-        search.toLowerCase()
-      );
-    });
+        return text.includes(
+          search.toLowerCase()
+        );
+      }
+    );
 
   async function changeMainPhoto(
     place,
@@ -2407,7 +3425,11 @@ function AdminPage({
 
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
+    if (
+      !file.type.startsWith(
+        "image/"
+      )
+    ) {
       setMessage(
         "Veuillez choisir une image."
       );
@@ -2415,7 +3437,10 @@ function AdminPage({
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (
+      file.size >
+      5 * 1024 * 1024
+    ) {
       setMessage(
         "La photo doit faire moins de 5 MB."
       );
@@ -2457,7 +3482,9 @@ function AdminPage({
         data: publicUrlData,
       } = supabase.storage
         .from("restaurant-photos")
-        .getPublicUrl(fileName);
+        .getPublicUrl(
+          fileName
+        );
 
       const imageUrl =
         publicUrlData.publicUrl;
@@ -2467,7 +3494,8 @@ function AdminPage({
       } = await supabase
         .from("places")
         .update({
-          main_image_url: imageUrl,
+          main_image_url:
+            imageUrl,
         })
         .eq("id", place.id);
 
@@ -2501,7 +3529,8 @@ function AdminPage({
       style={{
         maxWidth: 1200,
         margin: "0 auto",
-        padding: "50px 24px 80px",
+        padding:
+          "50px 24px 80px",
       }}
     >
       <button
@@ -2537,8 +3566,9 @@ function AdminPage({
           color: "#728492",
         }}
       >
-        Changez directement les photos
-        principales de vos lieux.
+        Changez directement les
+        photos principales de vos
+        lieux.
       </p>
 
       <div
@@ -2550,13 +3580,16 @@ function AdminPage({
         <input
           value={search}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearch(
+              e.target.value
+            )
           }
           placeholder="🔍 Rechercher un hôtel, restaurant..."
           style={{
             width: "100%",
             maxWidth: 600,
-            padding: "15px 17px",
+            padding:
+              "15px 17px",
             border:
               "1px solid #e2edf2",
             borderRadius: 14,
@@ -2589,123 +3622,134 @@ function AdminPage({
           gap: 20,
         }}
       >
-        {filteredPlaces.map((place) => (
-          <article
-            key={`${place._type}-${place.id}`}
-            style={{
-              background: "#fff",
-              border:
-                "1px solid #e2edf2",
-              borderRadius: 20,
-              overflow: "hidden",
-              boxShadow:
-                "0 10px 30px rgba(22,50,70,.06)",
-            }}
-          >
-            <img
-              src={getImage(
-                place,
-                place._type
-              )}
-              alt={`${place.name} à Al Hoceima`}
+        {filteredPlaces.map(
+          (place) => (
+            <article
+              key={`${place._type}-${place.id}`}
               style={{
-                width: "100%",
-                height: 200,
-                objectFit: "cover",
-                display: "block",
-              }}
-            />
-
-            <div
-              style={{
-                padding: 18,
+                background: "#fff",
+                border:
+                  "1px solid #e2edf2",
+                borderRadius: 20,
+                overflow: "hidden",
+                boxShadow:
+                  "0 10px 30px rgba(22,50,70,.06)",
               }}
             >
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: "#1499dc",
-                  textTransform:
-                    "uppercase",
-                }}
-              >
-                {getCategoryName(
+              <img
+                src={getImage(
+                  place,
                   place._type
                 )}
-              </span>
-
-              <h3
+                alt={`${place.name} à Al Hoceima`}
                 style={{
-                  marginTop: 6,
-                  marginBottom: 5,
-                }}
-              >
-                {place.name}
-              </h3>
-
-              <p
-                style={{
-                  color: "#728492",
-                  fontSize: 13,
-                  marginBottom: 15,
-                }}
-              >
-                {place.address ||
-                  "Al Hoceima, Maroc"}
-              </p>
-
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    "center",
-                  gap: 8,
                   width: "100%",
-                  padding: "12px 15px",
-                  borderRadius: 12,
-                  background: "#1499dc",
-                  color: "#fff",
-                  fontWeight: 800,
-                  cursor:
-                    uploadingId === place.id
-                      ? "wait"
-                      : "pointer",
-                  opacity:
-                    uploadingId === place.id
-                      ? 0.7
-                      : 1,
+                  height: 200,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+
+              <div
+                style={{
+                  padding: 18,
                 }}
               >
-                {uploadingId === place.id
-                  ? "⏳ Upload..."
-                  : "📷 Changer la photo"}
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={
-                    uploadingId ===
-                    place.id
-                  }
-                  onChange={(event) =>
-                    changeMainPhoto(
-                      place,
-                      event
-                    )
-                  }
+                <span
                   style={{
-                    display: "none",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color: "#1499dc",
+                    textTransform:
+                      "uppercase",
                   }}
-                />
-              </label>
-            </div>
-          </article>
-        ))}
+                >
+                  {getCategoryName(
+                    place._type
+                  )}
+                </span>
+
+                <h3
+                  style={{
+                    marginTop: 6,
+                    marginBottom: 5,
+                  }}
+                >
+                  {place.name}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#728492",
+                    fontSize: 13,
+                    marginBottom: 15,
+                  }}
+                >
+                  {place.address ||
+                    "Al Hoceima, Maroc"}
+                </p>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems:
+                      "center",
+                    justifyContent:
+                      "center",
+                    gap: 8,
+                    width: "100%",
+                    padding:
+                      "12px 15px",
+                    borderRadius: 12,
+                    background:
+                      "#1499dc",
+                    color: "#fff",
+                    fontWeight: 800,
+                    cursor:
+                      uploadingId ===
+                      place.id
+                        ? "wait"
+                        : "pointer",
+                    opacity:
+                      uploadingId ===
+                      place.id
+                        ? 0.7
+                        : 1,
+                  }}
+                >
+                  {uploadingId ===
+                  place.id
+                    ? "⏳ Upload..."
+                    : "📷 Changer la photo"}
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={
+                      uploadingId ===
+                      place.id
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      changeMainPhoto(
+                        place,
+                        event
+                      )
+                    }
+                    style={{
+                      display: "none",
+                    }}
+                  />
+                </label>
+              </div>
+            </article>
+          )
+        )}
       </div>
 
-      {filteredPlaces.length === 0 && (
+      {filteredPlaces.length ===
+        0 && (
         <div
           style={{
             padding: 40,
@@ -2729,17 +3773,25 @@ function updateMetaTag(
   attributeValue,
   content
 ) {
-  let meta = document.querySelector(
-    `meta[${attribute}="${attributeValue}"]`
-  );
+  let meta =
+    document.querySelector(
+      `meta[${attribute}="${attributeValue}"]`
+    );
 
   if (!meta) {
-    meta = document.createElement("meta");
+    meta =
+      document.createElement(
+        "meta"
+      );
+
     meta.setAttribute(
       attribute,
       attributeValue
     );
-    document.head.appendChild(meta);
+
+    document.head.appendChild(
+      meta
+    );
   }
 
   meta.setAttribute(
@@ -2756,7 +3808,9 @@ function updateCanonical(url) {
 
   if (!canonical) {
     canonical =
-      document.createElement("link");
+      document.createElement(
+        "link"
+      );
 
     canonical.setAttribute(
       "rel",
@@ -2806,6 +3860,39 @@ function updateJsonLd(data) {
 ========================================================= */
 
 export default function App() {
+  /* =======================================================
+     SPLASH / ONBOARDING / AUTH FLOW
+  ======================================================= */
+
+  const [showSplash, setShowSplash] =
+    useState(true);
+
+  const [showOnboarding, setShowOnboarding] =
+    useState(() => {
+      try {
+        return (
+          localStorage.getItem(
+            "villamap-onboarding-completed"
+          ) !== "true"
+        );
+      } catch {
+        return true;
+      }
+    });
+
+  const [showWelcomeAuth, setShowWelcomeAuth] =
+    useState(() => {
+      try {
+        return (
+          localStorage.getItem(
+            "villamap-auth-skipped"
+          ) !== "true"
+        );
+      } catch {
+        return true;
+      }
+    });
+
   const [search, setSearch] =
     useState("");
 
@@ -2847,6 +3934,20 @@ export default function App() {
     ADMIN_EMAIL.toLowerCase();
 
   /* =======================================================
+     SPLASH TIMER
+  ======================================================= */
+
+  useEffect(() => {
+    const timer =
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 2000);
+
+    return () =>
+      clearTimeout(timer);
+  }, []);
+
+  /* =======================================================
      AUTH
   ======================================================= */
 
@@ -2856,10 +3957,30 @@ export default function App() {
     async function getUser() {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } =
+        await supabase.auth.getUser();
 
       if (mounted) {
         setUser(user);
+
+        /*
+         * Si l'utilisateur est déjà connecté,
+         * on ne lui affiche pas l'écran Login.
+         */
+        if (user) {
+          setShowWelcomeAuth(
+            false
+          );
+
+          try {
+            localStorage.setItem(
+              "villamap-auth-skipped",
+              "true"
+            );
+          } catch {
+            // ignore
+          }
+        }
       }
     }
 
@@ -2870,14 +3991,31 @@ export default function App() {
     } =
       supabase.auth.onAuthStateChange(
         (_event, session) => {
-          setUser(
-            session?.user || null
-          );
+          const nextUser =
+            session?.user || null;
+
+          setUser(nextUser);
+
+          if (nextUser) {
+            setShowWelcomeAuth(
+              false
+            );
+
+            try {
+              localStorage.setItem(
+                "villamap-auth-skipped",
+                "true"
+              );
+            } catch {
+              // ignore
+            }
+          }
         }
       );
 
     return () => {
       mounted = false;
+
       listener.subscription.unsubscribe();
     };
   }, []);
@@ -2924,7 +4062,9 @@ export default function App() {
           );
 
         if (
-          grouped[place.category]
+          grouped[
+            place.category
+          ]
         ) {
           grouped[
             place.category
@@ -2959,7 +4099,8 @@ export default function App() {
       siteUrl;
 
     let structuredData = {
-      "@context": "https://schema.org",
+      "@context":
+        "https://schema.org",
       "@type": "WebSite",
       name: "VillaMap",
       url: siteUrl,
@@ -2972,7 +4113,10 @@ export default function App() {
       },
     };
 
-    if (showAdmin && isAdmin) {
+    if (
+      showAdmin &&
+      isAdmin
+    ) {
       title =
         "VillaMap Admin — Gestion des photos";
 
@@ -3013,7 +4157,8 @@ export default function App() {
         `${siteUrl}#${selectedPlaceType}-${selectedPlace.id}`;
 
       const baseType =
-        selectedPlaceType === "hotels"
+        selectedPlaceType ===
+        "hotels"
           ? "Hotel"
           : selectedPlaceType ===
             "restaurants"
@@ -3037,14 +4182,15 @@ export default function App() {
             selectedPlace.address ||
             undefined,
         },
-        image:
-          getImage(
-            selectedPlace,
-            selectedPlaceType
-          ),
+        image: getImage(
+          selectedPlace,
+          selectedPlaceType
+        ),
       };
 
-      if (selectedPlace.phone) {
+      if (
+        selectedPlace.phone
+      ) {
         structuredData.telephone =
           selectedPlace.phone;
       }
@@ -3090,16 +4236,17 @@ export default function App() {
       structuredData = {
         "@context":
           "https://schema.org",
-        "@type": "CollectionPage",
+        "@type":
+          "CollectionPage",
         name: title,
         description,
         url: canonicalUrl,
         inLanguage: "fr-MA",
         about: {
-          "@type":
-            "City",
+          "@type": "City",
           name: "Al Hoceima",
-          addressCountry: "MA",
+          addressCountry:
+            "MA",
         },
       };
     } else if (
@@ -3122,7 +4269,8 @@ export default function App() {
       structuredData = {
         "@context":
           "https://schema.org",
-        "@type": "SearchResultsPage",
+        "@type":
+          "SearchResultsPage",
         name: title,
         description,
         url: canonicalUrl,
@@ -3222,7 +4370,9 @@ export default function App() {
     setShowAdmin(false);
     setSelectedPlace(null);
     setSelectedPlaceType(null);
-    setSelectedCategory(category);
+    setSelectedCategory(
+      category
+    );
   }
 
   function openCategory(
@@ -3245,8 +4395,13 @@ export default function App() {
     setSelectedPlace(null);
     setSelectedPlaceType(null);
 
-    if (selectedCategory === null) {
-      setSelectedCategory("all");
+    if (
+      selectedCategory ===
+      null
+    ) {
+      setSelectedCategory(
+        "all"
+      );
     }
   }
 
@@ -3268,6 +4423,61 @@ export default function App() {
     setSelectedCategory(null);
     setSearch("");
     setShowAdmin(true);
+  }
+
+  /* =======================================================
+     FINISH ONBOARDING
+  ======================================================= */
+
+  function finishOnboarding() {
+    try {
+      localStorage.setItem(
+        "villamap-onboarding-completed",
+        "true"
+      );
+    } catch {
+      // ignore
+    }
+
+    setShowOnboarding(false);
+  }
+
+  /* =======================================================
+     SKIP LOGIN
+  ======================================================= */
+
+  function skipWelcomeAuth() {
+    try {
+      localStorage.setItem(
+        "villamap-auth-skipped",
+        "true"
+      );
+    } catch {
+      // ignore
+    }
+
+    setShowWelcomeAuth(false);
+  }
+
+  /* =======================================================
+     USER CHANGE FROM LOGIN
+  ======================================================= */
+
+  function handleWelcomeUserChange(
+    nextUser
+  ) {
+    setUser(nextUser);
+
+    try {
+      localStorage.setItem(
+        "villamap-auth-skipped",
+        "true"
+      );
+    } catch {
+      // ignore
+    }
+
+    setShowWelcomeAuth(false);
   }
 
   /* =======================================================
@@ -3297,7 +4507,9 @@ export default function App() {
       <DetailPage
         item={selectedPlace}
         type={selectedPlaceType}
-        onBack={backToExplorer}
+        onBack={
+          backToExplorer
+        }
         user={user}
         onAuth={() =>
           setShowAuth(true)
@@ -3340,81 +4552,131 @@ export default function App() {
 
   return (
     <div className="app">
-      <Navbar
-        search={search}
-        setSearch={setSearch}
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-        onHome={goHome}
-        onExplorer={() =>
-          goExplorer("all")
-        }
-        onCategory={openCategory}
-        user={user}
-        onAuth={() =>
-          setShowAuth(true)
-        }
-        isAdmin={isAdmin}
-        onAdmin={openAdmin}
-      />
-
-      {loadingPlaces && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 20,
-            left: "50%",
-            transform:
-              "translateX(-50%)",
-            zIndex: 500,
-            background: "#163246",
-            color: "#fff",
-            padding: "10px 16px",
-            borderRadius: 12,
-            fontSize: 12,
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,.15)",
-          }}
-        >
-          Chargement des lieux...
-        </div>
-      )}
-
-      {errorPlaces && (
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "15px auto",
-            padding: "0 24px",
-          }}
-        >
-          <div
-            style={{
-              background: "#fff4f4",
-              border:
-                "1px solid #ffd4d4",
-              color: "#a94a4a",
-              borderRadius: 12,
-              padding: 12,
-              fontSize: 13,
-            }}
-          >
-            {errorPlaces}
-          </div>
-        </div>
-      )}
-
-      {page}
-
-      <Footer />
-
-      {showAuth && (
-        <AuthModal
-          onClose={() =>
-            setShowAuth(false)
+      {/*
+       * SPLASH
+       * أول حاجة تظهر للمستخدم
+       */}
+      {showSplash ? (
+        <SplashScreen />
+      ) : showOnboarding ? (
+        /*
+         * ONBOARDING
+         */
+        <OnboardingScreen
+          onFinish={
+            finishOnboarding
           }
-          onUserChange={setUser}
         />
+      ) : showWelcomeAuth &&
+        !user ? (
+        /*
+         * LOGIN / INSCRIPTION
+         */
+        <AuthScreen
+          onSkip={
+            skipWelcomeAuth
+          }
+          onUserChange={
+            handleWelcomeUserChange
+          }
+        />
+      ) : (
+        /*
+         * VILLAMAP APP
+         */
+        <>
+          <Navbar
+            search={search}
+            setSearch={setSearch}
+            menuOpen={menuOpen}
+            setMenuOpen={
+              setMenuOpen
+            }
+            onHome={goHome}
+            onExplorer={() =>
+              goExplorer("all")
+            }
+            onCategory={
+              openCategory
+            }
+            user={user}
+            onAuth={() =>
+              setShowAuth(true)
+            }
+            isAdmin={isAdmin}
+            onAdmin={openAdmin}
+          />
+
+          {loadingPlaces && (
+            <div
+              style={{
+                position: "fixed",
+                bottom: 20,
+                left: "50%",
+                transform:
+                  "translateX(-50%)",
+                zIndex: 500,
+                background:
+                  "#163246",
+                color: "#fff",
+                padding:
+                  "10px 16px",
+                borderRadius: 12,
+                fontSize: 12,
+                boxShadow:
+                  "0 10px 30px rgba(0,0,0,.15)",
+              }}
+            >
+              Chargement des
+              lieux...
+            </div>
+          )}
+
+          {errorPlaces && (
+            <div
+              style={{
+                maxWidth: 1200,
+                margin:
+                  "15px auto",
+                padding:
+                  "0 24px",
+              }}
+            >
+              <div
+                style={{
+                  background:
+                    "#fff4f4",
+                  border:
+                    "1px solid #ffd4d4",
+                  color:
+                    "#a94a4a",
+                  borderRadius: 12,
+                  padding: 12,
+                  fontSize: 13,
+                }}
+              >
+                {errorPlaces}
+              </div>
+            </div>
+          )}
+
+          {page}
+
+          <Footer />
+
+          {showAuth && (
+            <AuthModal
+              onClose={() =>
+                setShowAuth(
+                  false
+                )
+              }
+              onUserChange={
+                setUser
+              }
+            />
+          )}
+        </>
       )}
     </div>
   );
