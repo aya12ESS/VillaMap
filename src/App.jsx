@@ -338,8 +338,13 @@ function Navbar({
         <button
           className="logo"
           onClick={() => go(onHome)}
+          aria-label="Retour à l'accueil VillaMap"
         >
-          <img src={logo} alt="VillaMap" className="logo-image" />
+          <img
+            src={logo}
+            alt="VillaMap — guide local d'Al Hoceima"
+            className="logo-image"
+          />
         </button>
 
         <nav
@@ -380,13 +385,21 @@ function Navbar({
           </button>
 
           <button
-            onClick={() =>
-              document
-                .getElementById("about")
-                ?.scrollIntoView({
-                  behavior: "smooth",
-                })
-            }
+            onClick={() => {
+              setMenuOpen(false);
+
+              if (onHome) {
+                onHome();
+              }
+
+              setTimeout(() => {
+                document
+                  .getElementById("about")
+                  ?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+              }, 50);
+            }}
           >
             À propos
           </button>
@@ -395,27 +408,29 @@ function Navbar({
         <div className="nav-location">
           ⌖ Al Hoceima
         </div>
-{isAdmin && (
-  <button
-    onClick={() => {
-      setMenuOpen(false);
-      onAdmin();
-      scrollTop();
-    }}
-    style={{
-      border: 0,
-      background: "#163246",
-      color: "#fff",
-      borderRadius: 11,
-      padding: "9px 13px",
-      fontWeight: 750,
-      fontSize: 12,
-      cursor: "pointer",
-    }}
-  >
-    📸 Admin
-  </button>
-)}
+
+        {isAdmin && (
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              onAdmin();
+              scrollTop();
+            }}
+            style={{
+              border: 0,
+              background: "#163246",
+              color: "#fff",
+              borderRadius: 11,
+              padding: "9px 13px",
+              fontWeight: 750,
+              fontSize: 12,
+              cursor: "pointer",
+            }}
+          >
+            📸 Admin
+          </button>
+        )}
+
         <button
           onClick={user ? logout : onAuth}
           style={{
@@ -468,7 +483,8 @@ function SearchBox({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Que cherchez-vous ?"
+        placeholder="Rechercher un lieu à Al Hoceima..."
+        aria-label="Rechercher un lieu à Al Hoceima"
       />
 
       <button type="submit">
@@ -486,7 +502,8 @@ function CategoryGrid({ onCategory, data }) {
   return (
     <div className="category-grid-modern">
       {categories.map((category) => {
-        const count = data?.[category.id]?.length || 0;
+        const count =
+          data?.[category.id]?.length || 0;
 
         return (
           <button
@@ -519,7 +536,13 @@ function FavoriteButton({ item, type }) {
   const key = `villamap-favorite-${type}-${item.id}`;
 
   const [favorite, setFavorite] = useState(
-    () => localStorage.getItem(key) === "true"
+    () => {
+      try {
+        return localStorage.getItem(key) === "true";
+      } catch {
+        return false;
+      }
+    }
   );
 
   function toggle(e) {
@@ -529,7 +552,11 @@ function FavoriteButton({ item, type }) {
 
     setFavorite(next);
 
-    localStorage.setItem(key, String(next));
+    try {
+      localStorage.setItem(key, String(next));
+    } catch {
+      // Ignore localStorage errors
+    }
   }
 
   return (
@@ -538,7 +565,12 @@ function FavoriteButton({ item, type }) {
         favorite ? "favorite" : ""
       }`}
       onClick={toggle}
-      aria-label="Favori"
+      aria-label={
+        favorite
+          ? "Retirer des favoris"
+          : "Ajouter aux favoris"
+      }
+      type="button"
     >
       {favorite ? "♥" : "♡"}
     </button>
@@ -555,17 +587,36 @@ function PlaceCard({
   onClick,
 }) {
   const rating = Number(item.rating || 0);
+  const placeName =
+    item.name || "Lieu sans nom";
+
+  function open() {
+    onClick(item, type);
+    scrollTop();
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open();
+    }
+  }
 
   return (
     <article
       className="listing-card"
-      onClick={() => {
-        onClick(item, type);
-        scrollTop();
-      }}
+      onClick={open}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`${placeName} — ${getCategoryName(
+        type
+      )} à Al Hoceima`}
     >
       <div
         className="listing-photo"
+        role="img"
+        aria-label={`${placeName} à Al Hoceima`}
         style={{
           backgroundImage: `url("${getImage(
             item,
@@ -588,9 +639,7 @@ function PlaceCard({
           {getCategoryName(type)}
         </span>
 
-        <h3>
-          {item.name || "Lieu sans nom"}
-        </h3>
+        <h3>{placeName}</h3>
 
         <p className="muted">
           📍{" "}
@@ -671,6 +720,11 @@ function ReviewsSection({
 
     if (!error) {
       setReviews(data || []);
+    } else {
+      console.error(
+        "Reviews error:",
+        error
+      );
     }
   }
 
@@ -957,7 +1011,8 @@ function ReviewsSection({
     </section>
   );
 }
- /* =========================================================
+
+/* =========================================================
    PLACE PHOTOS
 ========================================================= */
 
@@ -971,14 +1026,19 @@ function PlacePhotos({ item, user, onAuth }) {
   async function loadPhotos() {
     const { data, error } = await supabase
       .from("restaurant_photos")
-      .select("id, place_id, image_url, created_at")
+      .select(
+        "id, place_id, image_url, created_at"
+      )
       .eq("place_id", placeId)
       .order("created_at", {
         ascending: false,
       });
 
     if (error) {
-      console.error("Photos error:", error);
+      console.error(
+        "Photos error:",
+        error
+      );
       return;
     }
 
@@ -990,7 +1050,8 @@ function PlacePhotos({ item, user, onAuth }) {
   }, [placeId]);
 
   async function handleUpload(event) {
-    const file = event.target.files?.[0];
+    const file =
+      event.target.files?.[0];
 
     if (!file) return;
 
@@ -1001,13 +1062,17 @@ function PlacePhotos({ item, user, onAuth }) {
     }
 
     if (!file.type.startsWith("image/")) {
-      setMessage("Veuillez choisir une image.");
+      setMessage(
+        "Veuillez choisir une image."
+      );
       event.target.value = "";
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setMessage("La photo doit faire moins de 5 MB.");
+      setMessage(
+        "La photo doit faire moins de 5 MB."
+      );
       event.target.value = "";
       return;
     }
@@ -1017,40 +1082,44 @@ function PlacePhotos({ item, user, onAuth }) {
 
     try {
       const extension =
-        file.name.split(".").pop() || "jpg";
+        file.name.split(".").pop() ||
+        "jpg";
 
       const fileName =
         `${placeId}/${Date.now()}-${Math.random()
           .toString(36)
           .slice(2)}.${extension}`;
 
-      const { error: uploadError } =
-        await supabase.storage
-          .from("restaurant-photos")
-          .upload(fileName, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
+      const {
+        error: uploadError,
+      } = await supabase.storage
+        .from("restaurant-photos")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (uploadError) {
         throw uploadError;
       }
 
-      const { data: publicUrlData } =
-        supabase.storage
-          .from("restaurant-photos")
-          .getPublicUrl(fileName);
+      const {
+        data: publicUrlData,
+      } = supabase.storage
+        .from("restaurant-photos")
+        .getPublicUrl(fileName);
 
       const imageUrl =
         publicUrlData.publicUrl;
 
-      const { error: insertError } =
-        await supabase
-          .from("restaurant_photos")
-          .insert({
-            place_id: placeId,
-            image_url: imageUrl,
-          });
+      const {
+        error: insertError,
+      } = await supabase
+        .from("restaurant_photos")
+        .insert({
+          place_id: placeId,
+          image_url: imageUrl,
+        });
 
       if (insertError) {
         throw insertError;
@@ -1159,7 +1228,7 @@ function PlacePhotos({ item, user, onAuth }) {
             <img
               key={photo.id}
               src={photo.image_url}
-              alt={`Photo de ${item.name}`}
+              alt={`Photo de ${item.name} à Al Hoceima`}
               style={{
                 width: "100%",
                 height: 180,
@@ -1228,7 +1297,7 @@ function DetailPage({
       </button>
 
       <div className="detail-breadcrumb">
-        Accueil /{" "}
+        Accueil / Al Hoceima /{" "}
         {getCategoryName(type)} /{" "}
         {item.name}
       </div>
@@ -1311,6 +1380,8 @@ function DetailPage({
         <div>
           <div
             className="detail-main-photo"
+            role="img"
+            aria-label={`${item.name} à Al Hoceima`}
             style={{
               backgroundImage: `url("${image}")`,
             }}
@@ -1322,24 +1393,28 @@ function DetailPage({
 
           <div className="detail-thumbs">
             <div
+              aria-hidden="true"
               style={{
                 backgroundImage: `url("${image}")`,
               }}
             />
 
             <div
+              aria-hidden="true"
               style={{
                 backgroundImage: `url("${image}")`,
               }}
             />
 
             <div
+              aria-hidden="true"
               style={{
                 backgroundImage: `url("${image}")`,
               }}
             />
 
             <div
+              aria-hidden="true"
               style={{
                 backgroundImage: `url("${image}")`,
               }}
@@ -1358,9 +1433,11 @@ function DetailPage({
             <div className="info-list">
               <div>
                 <span>⌖</span>
+
                 <label>
                   Adresse
                 </label>
+
                 <strong>
                   {item.address ||
                     "Al Hoceima"}
@@ -1369,9 +1446,11 @@ function DetailPage({
 
               <div>
                 <span>★</span>
+
                 <label>
                   Note
                 </label>
+
                 <strong>
                   {rating
                     ? `${rating.toFixed(
@@ -1384,9 +1463,11 @@ function DetailPage({
               {item.phone && (
                 <div>
                   <span>☎</span>
+
                   <label>
                     Téléphone
                   </label>
+
                   <strong>
                     {item.phone}
                   </strong>
@@ -1396,9 +1477,11 @@ function DetailPage({
               {item.price && (
                 <div>
                   <span>DH</span>
+
                   <label>
                     Prix indicatif
                   </label>
+
                   <strong>
                     {item.price}
                   </strong>
@@ -1463,11 +1546,13 @@ function DetailPage({
                 </div>
               </section>
             )}
-<PlacePhotos
-  item={item}
-  user={user}
-  onAuth={onAuth}
-/>
+
+          <PlacePhotos
+            item={item}
+            user={user}
+            onAuth={onAuth}
+          />
+
           <ReviewsSection
             item={item}
             type={type}
@@ -1511,6 +1596,21 @@ function DetailPage({
                 "_blank"
               )
             }
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (
+                e.key === "Enter" ||
+                e.key === " "
+              ) {
+                e.preventDefault();
+
+                window.open(
+                  mapsUrl(item),
+                  "_blank"
+                );
+              }
+            }}
           >
             <span>⌖</span>
 
@@ -1621,59 +1721,74 @@ function ExplorerPage({
   }, [categoriesToShow]);
 
   const normalizeText = (value) =>
-  String(value || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
+    String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .trim();
 
-const filtered = categoriesToShow.filter((place) => {
-  const searchText = normalizeText(search);
+  const filtered = categoriesToShow.filter(
+    (place) => {
+      const searchText =
+        normalizeText(search);
 
-  const searchableText = normalizeText(
-    [
-      place.name,
-      place.title,
-      place.address,
-      place.location,
-      place.description,
-      place.category,
-      place.type,
-      place._type,
-      place.phone,
-      place.email,
-      Array.isArray(place.services)
-        ? place.services.join(" ")
-        : place.services,
-      Array.isArray(place.tags)
-        ? place.tags.join(" ")
-        : place.tags,
-    ]
-      .filter(Boolean)
-      .join(" ")
+      const searchableText =
+        normalizeText(
+          [
+            place.name,
+            place.title,
+            place.address,
+            place.location,
+            place.description,
+            place.category,
+            place.type,
+            place._type,
+            place.phone,
+            place.email,
+            Array.isArray(place.services)
+              ? place.services.join(" ")
+              : place.services,
+            Array.isArray(place.tags)
+              ? place.tags.join(" ")
+              : place.tags,
+          ]
+            .filter(Boolean)
+            .join(" ")
+        );
+
+      const matchesSearch =
+        !searchText ||
+        searchableText.includes(
+          searchText
+        );
+
+      const matchesFilter =
+        activeFilter === "Tous" ||
+        (Array.isArray(place.services) &&
+          place.services.some(
+            (service) =>
+              normalizeText(service) ===
+              normalizeText(
+                activeFilter
+              )
+          )) ||
+        (Array.isArray(place.tags) &&
+          place.tags.some(
+            (tag) =>
+              normalizeText(tag) ===
+              normalizeText(
+                activeFilter
+              )
+          ));
+
+      return (
+        matchesSearch && matchesFilter
+      );
+    }
   );
-
-  const matchesSearch =
-    !searchText ||
-    searchableText.includes(searchText);
-
-  const matchesFilter =
-    activeFilter === "Tous" ||
-    (Array.isArray(place.services) &&
-      place.services.some(
-        (service) =>
-          normalizeText(service) ===
-          normalizeText(activeFilter)
-      )) ||
-    (Array.isArray(place.tags) &&
-      place.tags.some(
-        (tag) =>
-          normalizeText(tag) ===
-          normalizeText(activeFilter)
-      ));
-
-  return matchesSearch && matchesFilter;
-});
 
   return (
     <main className="explorer-page">
@@ -1687,7 +1802,8 @@ const filtered = categoriesToShow.filter((place) => {
 
       <p>
         Hôtels, restaurants, cafés,
-        gaming, shopping et bien plus.
+        pharmacies, activités, gaming,
+        shopping et services à Al Hoceima.
       </p>
 
       <SearchBox
@@ -1798,10 +1914,16 @@ function HomePage({
     ) || [];
 
   const featuredHotels =
-    placesData.hotels?.slice(0, 3) || [];
+    placesData.hotels?.slice(
+      0,
+      3
+    ) || [];
 
   const featuredGaming =
-    placesData.gaming?.slice(0, 3) || [];
+    placesData.gaming?.slice(
+      0,
+      3
+    ) || [];
 
   return (
     <>
@@ -1822,9 +1944,11 @@ function HomePage({
           </h1>
 
           <p>
-            Explorez les meilleurs hôtels,
-            restaurants, cafés, activités
-            et adresses locales de la ville.
+            Explorez Al Hoceima avec VillaMap :
+            découvrez les meilleurs hôtels,
+            restaurants, cafés, pharmacies,
+            activités, gaming et services locaux
+            au cœur du Maroc méditerranéen.
           </p>
 
           <SearchBox
@@ -1832,8 +1956,6 @@ function HomePage({
             onChange={setSearch}
             onSubmit={onSearch}
           />
-
-          {/* HERO HIGHLIGHTS */}
 
           <div className="hero-highlights">
             <span>🏨 Hôtels</span>
@@ -1846,7 +1968,7 @@ function HomePage({
         <div className="hero-visual">
           <img
             src={heroImage}
-            alt="Al Hoceima"
+            alt="Plage d'Al Hoceima, Maroc — destination méditerranéenne"
           />
 
           <div className="hero-map-badge">
@@ -1872,16 +1994,18 @@ function HomePage({
         <div className="section-heading">
           <div>
             <span className="page-kicker">
-              EXPLOREZ
+              EXPLOREZ AL HOCEIMA
             </span>
 
             <h2>
-              Qu'est-ce que vous cherchez ?
+              Que cherchez-vous à Al Hoceima ?
             </h2>
 
             <p>
-              Découvrez les différentes
-              catégories de VillaMap.
+              Découvrez les hôtels, restaurants,
+              cafés, pharmacies, activités, gaming,
+              shopping et autres services disponibles
+              à Al Hoceima avec VillaMap.
             </p>
           </div>
 
@@ -1911,15 +2035,18 @@ function HomePage({
           <div className="section-heading">
             <div>
               <span className="page-kicker">
-                À TABLE
+                RESTAURANTS À AL HOCEIMA
               </span>
 
               <h2>
-                Restaurants populaires
+                Restaurants à découvrir à Al Hoceima
               </h2>
 
               <p>
-                Quelques adresses à découvrir.
+                Découvrez une sélection de restaurants
+                à Al Hoceima, avec leurs adresses,
+                informations pratiques, avis et
+                localisation sur VillaMap.
               </p>
             </div>
 
@@ -1958,16 +2085,18 @@ function HomePage({
           <div className="section-heading">
             <div>
               <span className="page-kicker">
-                SÉJOUR
+                HÔTELS À AL HOCEIMA
               </span>
 
               <h2>
-                Où dormir ?
+                Hôtels et hébergements à Al Hoceima
               </h2>
 
               <p>
-                Découvrez les hébergements
-                disponibles.
+                Découvrez les hôtels et hébergements
+                à Al Hoceima, avec leurs informations
+                pratiques, avis, photos et
+                localisation sur VillaMap.
               </p>
             </div>
 
@@ -2004,16 +2133,18 @@ function HomePage({
           <div className="section-heading">
             <div>
               <span className="page-kicker">
-                GAMING
+                GAMING À AL HOCEIMA
               </span>
 
               <h2>
-                Gaming à Al Hoceima
+                Gaming et espaces de jeux à Al Hoceima
               </h2>
 
               <p>
-                PlayStation, PC gaming et
-                espaces gaming.
+                Découvrez les espaces gaming à
+                Al Hoceima : PlayStation, PC gaming
+                et lieux dédiés aux jeux vidéo
+                pour jouer et se divertir.
               </p>
             </div>
 
@@ -2061,13 +2192,14 @@ function HomePage({
           </h2>
 
           <p>
-            VillaMap est un guide local pensé
-            pour faciliter la découverte
-            d'Al Hoceima. Trouvez rapidement
-            les lieux, consultez les
-            informations pratiques et
-            découvrez les adresses appréciées
-            par la communauté.
+            VillaMap est un guide local dédié à
+            Al Hoceima, au Maroc. Explorez
+            facilement les hôtels, restaurants,
+            cafés, pharmacies, activités, gaming,
+            shopping et autres services de la ville.
+            Consultez les adresses, photos, avis et
+            informations pratiques, puis localisez
+            facilement chaque endroit sur Google Maps.
           </p>
         </div>
 
@@ -2080,7 +2212,8 @@ function HomePage({
             </strong>
 
             <span>
-              Une recherche simple et rapide.
+              Recherchez rapidement les lieux et
+              services à Al Hoceima.
             </span>
           </div>
 
@@ -2092,8 +2225,8 @@ function HomePage({
             </strong>
 
             <span>
-              Consultez les expériences des
-              visiteurs.
+              Consultez les notes et avis pour mieux
+              connaître les établissements.
             </span>
           </div>
 
@@ -2220,14 +2353,21 @@ function normalizePlace(place) {
     ),
   };
 }
+
 /* =========================================================
    ADMIN PAGE
 ========================================================= */
 
-function AdminPage({ placesData, onPlacesUpdated }) {
+function AdminPage({
+  placesData,
+  onPlacesUpdated,
+  onBack,
+}) {
   const [search, setSearch] = useState("");
-  const [uploadingId, setUploadingId] = useState(null);
-  const [message, setMessage] = useState("");
+  const [uploadingId, setUploadingId] =
+    useState(null);
+  const [message, setMessage] =
+    useState("");
 
   const allPlaces = useMemo(() => {
     const result = [];
@@ -2246,27 +2386,39 @@ function AdminPage({ placesData, onPlacesUpdated }) {
     return result;
   }, [placesData]);
 
-  const filteredPlaces = allPlaces.filter((place) => {
-    const text = `${place.name || ""} ${
-      place.address || ""
-    } ${place._type || ""}`.toLowerCase();
+  const filteredPlaces =
+    allPlaces.filter((place) => {
+      const text =
+        `${place.name || ""} ${
+          place.address || ""
+        } ${place._type || ""}`.toLowerCase();
 
-    return text.includes(search.toLowerCase());
-  });
+      return text.includes(
+        search.toLowerCase()
+      );
+    });
 
-  async function changeMainPhoto(place, event) {
-    const file = event.target.files?.[0];
+  async function changeMainPhoto(
+    place,
+    event
+  ) {
+    const file =
+      event.target.files?.[0];
 
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setMessage("Veuillez choisir une image.");
+      setMessage(
+        "Veuillez choisir une image."
+      );
       event.target.value = "";
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setMessage("La photo doit faire moins de 5 MB.");
+      setMessage(
+        "La photo doit faire moins de 5 MB."
+      );
       event.target.value = "";
       return;
     }
@@ -2276,40 +2428,48 @@ function AdminPage({ placesData, onPlacesUpdated }) {
 
     try {
       const extension =
-        file.name.split(".").pop() || "jpg";
+        file.name.split(".").pop() ||
+        "jpg";
 
       const fileName =
         `main/${place.id}/${Date.now()}-${Math.random()
           .toString(36)
           .slice(2)}.${extension}`;
 
-      const { error: uploadError } =
-        await supabase.storage
-          .from("restaurant-photos")
-          .upload(fileName, file, {
+      const {
+        error: uploadError,
+      } = await supabase.storage
+        .from("restaurant-photos")
+        .upload(
+          fileName,
+          file,
+          {
             cacheControl: "3600",
             upsert: false,
-          });
+          }
+        );
 
       if (uploadError) {
         throw uploadError;
       }
 
-      const { data: publicUrlData } =
-        supabase.storage
-          .from("restaurant-photos")
-          .getPublicUrl(fileName);
+      const {
+        data: publicUrlData,
+      } = supabase.storage
+        .from("restaurant-photos")
+        .getPublicUrl(fileName);
 
       const imageUrl =
         publicUrlData.publicUrl;
 
-      const { error: updateError } =
-        await supabase
-          .from("places")
-          .update({
-            main_image_url: imageUrl,
-          })
-          .eq("id", place.id);
+      const {
+        error: updateError,
+      } = await supabase
+        .from("places")
+        .update({
+          main_image_url: imageUrl,
+        })
+        .eq("id", place.id);
 
       if (updateError) {
         throw updateError;
@@ -2344,6 +2504,19 @@ function AdminPage({ placesData, onPlacesUpdated }) {
         padding: "50px 24px 80px",
       }}
     >
+      <button
+        className="back-link"
+        onClick={() => {
+          onBack?.();
+          scrollTop();
+        }}
+        style={{
+          marginBottom: 20,
+        }}
+      >
+        ← Retour à l'accueil
+      </button>
+
       <span className="page-kicker">
         VILLAMAP ADMIN
       </span>
@@ -2351,7 +2524,8 @@ function AdminPage({ placesData, onPlacesUpdated }) {
       <h1
         style={{
           marginTop: 8,
-          fontSize: "clamp(32px, 5vw, 52px)",
+          fontSize:
+            "clamp(32px, 5vw, 52px)",
         }}
       >
         Gestion des photos 📸
@@ -2383,7 +2557,8 @@ function AdminPage({ placesData, onPlacesUpdated }) {
             width: "100%",
             maxWidth: 600,
             padding: "15px 17px",
-            border: "1px solid #e2edf2",
+            border:
+              "1px solid #e2edf2",
             borderRadius: 14,
             outline: "none",
             fontSize: 15,
@@ -2419,7 +2594,8 @@ function AdminPage({ placesData, onPlacesUpdated }) {
             key={`${place._type}-${place.id}`}
             style={{
               background: "#fff",
-              border: "1px solid #e2edf2",
+              border:
+                "1px solid #e2edf2",
               borderRadius: 20,
               overflow: "hidden",
               boxShadow:
@@ -2431,7 +2607,7 @@ function AdminPage({ placesData, onPlacesUpdated }) {
                 place,
                 place._type
               )}
-              alt={place.name}
+              alt={`${place.name} à Al Hoceima`}
               style={{
                 width: "100%",
                 height: 200,
@@ -2450,7 +2626,8 @@ function AdminPage({ placesData, onPlacesUpdated }) {
                   fontSize: 11,
                   fontWeight: 800,
                   color: "#1499dc",
-                  textTransform: "uppercase",
+                  textTransform:
+                    "uppercase",
                 }}
               >
                 {getCategoryName(
@@ -2482,7 +2659,8 @@ function AdminPage({ placesData, onPlacesUpdated }) {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent:
+                    "center",
                   gap: 8,
                   width: "100%",
                   padding: "12px 15px",
@@ -2508,7 +2686,8 @@ function AdminPage({ placesData, onPlacesUpdated }) {
                   type="file"
                   accept="image/*"
                   disabled={
-                    uploadingId === place.id
+                    uploadingId ===
+                    place.id
                   }
                   onChange={(event) =>
                     changeMainPhoto(
@@ -2540,6 +2719,88 @@ function AdminPage({ placesData, onPlacesUpdated }) {
     </main>
   );
 }
+
+/* =========================================================
+   SEO HELPERS
+========================================================= */
+
+function updateMetaTag(
+  attribute,
+  attributeValue,
+  content
+) {
+  let meta = document.querySelector(
+    `meta[${attribute}="${attributeValue}"]`
+  );
+
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute(
+      attribute,
+      attributeValue
+    );
+    document.head.appendChild(meta);
+  }
+
+  meta.setAttribute(
+    "content",
+    content
+  );
+}
+
+function updateCanonical(url) {
+  let canonical =
+    document.querySelector(
+      'link[rel="canonical"]'
+    );
+
+  if (!canonical) {
+    canonical =
+      document.createElement("link");
+
+    canonical.setAttribute(
+      "rel",
+      "canonical"
+    );
+
+    document.head.appendChild(
+      canonical
+    );
+  }
+
+  canonical.setAttribute(
+    "href",
+    url
+  );
+}
+
+function updateJsonLd(data) {
+  let script =
+    document.getElementById(
+      "villamap-jsonld"
+    );
+
+  if (!script) {
+    script =
+      document.createElement(
+        "script"
+      );
+
+    script.id =
+      "villamap-jsonld";
+
+    script.type =
+      "application/ld+json";
+
+    document.head.appendChild(
+      script
+    );
+  }
+
+  script.textContent =
+    JSON.stringify(data);
+}
+
 /* =========================================================
    APP
 ========================================================= */
@@ -2572,15 +2833,19 @@ export default function App() {
   const [showAuth, setShowAuth] =
     useState(false);
 
+  const [showAdmin, setShowAdmin] =
+    useState(false);
+
   const [user, setUser] =
     useState(null);
-    const [showAdmin, setShowAdmin] = useState(false);
-   
-const ADMIN_EMAIL = "ayaesslimani73@gmail.com";
 
-const isAdmin =
-  user?.email?.toLowerCase() ===
-  ADMIN_EMAIL.toLowerCase();
+  const ADMIN_EMAIL =
+    "ayaesslimani73@gmail.com";
+
+  const isAdmin =
+    user?.email?.toLowerCase() ===
+    ADMIN_EMAIL.toLowerCase();
+
   /* =======================================================
      AUTH
   ======================================================= */
@@ -2602,13 +2867,14 @@ const isAdmin =
 
     const {
       data: listener,
-    } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(
-          session?.user || null
-        );
-      }
-    );
+    } =
+      supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          setUser(
+            session?.user || null
+          );
+        }
+      );
 
     return () => {
       mounted = false;
@@ -2620,40 +2886,42 @@ const isAdmin =
      LOAD PLACES FROM SUPABASE
   ======================================================= */
 
-  useEffect(() => {
-    async function loadPlaces() {
-      setLoadingPlaces(true);
-      setErrorPlaces("");
+  async function loadPlacesFromSupabase() {
+    setLoadingPlaces(true);
+    setErrorPlaces("");
 
-      const { data, error } =
-        await supabase
-          .from("places")
-          .select("*")
-          .order("id", {
-            ascending: true,
-          });
+    const { data, error } =
+      await supabase
+        .from("places")
+        .select("*")
+        .order("id", {
+          ascending: true,
+        });
 
-      if (error) {
-        console.error(
-          "Supabase places error:",
-          error
-        );
+    if (error) {
+      console.error(
+        "Supabase places error:",
+        error
+      );
 
-        setErrorPlaces(
-          "Impossible de charger les lieux depuis Supabase."
-        );
+      setErrorPlaces(
+        "Impossible de charger les lieux depuis Supabase."
+      );
 
-        setLoadingPlaces(false);
-        return;
-      }
+      setLoadingPlaces(false);
+      return;
+    }
 
-      const grouped = {
-        ...emptyData,
-      };
+    const grouped = {
+      ...emptyData,
+    };
 
-      (data || []).forEach((rawPlace) => {
+    (data || []).forEach(
+      (rawPlace) => {
         const place =
-          normalizePlace(rawPlace);
+          normalizePlace(
+            rawPlace
+          );
 
         if (
           grouped[place.category]
@@ -2662,100 +2930,378 @@ const isAdmin =
             place.category
           ].push(place);
         }
-      });
+      }
+    );
 
-      setPlacesData(grouped);
-      setLoadingPlaces(false);
+    setPlacesData(grouped);
+    setLoadingPlaces(false);
+  }
+
+  useEffect(() => {
+    loadPlacesFromSupabase();
+  }, []);
+
+  /* =======================================================
+     DYNAMIC SEO
+  ======================================================= */
+
+  useEffect(() => {
+    const siteUrl =
+      "https://villa-map-oo6p.vercel.app/";
+
+    let title =
+      "VillaMap — Guide local d'Al Hoceima | Hôtels, restaurants et services";
+
+    let description =
+      "VillaMap est votre guide local à Al Hoceima, Maroc. Découvrez hôtels, restaurants, cafés, pharmacies, activités, gaming, shopping et services locaux.";
+
+    let canonicalUrl =
+      siteUrl;
+
+    let structuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "VillaMap",
+      url: siteUrl,
+      description,
+      inLanguage: "fr-MA",
+      areaServed: {
+        "@type": "City",
+        name: "Al Hoceima",
+        addressCountry: "MA",
+      },
+    };
+
+    if (showAdmin && isAdmin) {
+      title =
+        "VillaMap Admin — Gestion des photos";
+
+      description =
+        "Espace d'administration VillaMap pour gérer les photos principales des lieux.";
+
+      canonicalUrl =
+        `${siteUrl}#admin`;
+
+      structuredData = {
+        "@context":
+          "https://schema.org",
+        "@type": "WebSite",
+        name: "VillaMap",
+        url: siteUrl,
+      };
+    } else if (
+      selectedPlace &&
+      selectedPlaceType
+    ) {
+      const categoryName =
+        getCategoryName(
+          selectedPlaceType
+        );
+
+      const placeName =
+        selectedPlace.name ||
+        "Lieu";
+
+      title =
+        `${placeName} — ${categoryName} à Al Hoceima | VillaMap`;
+
+      description =
+        selectedPlace.description ||
+        `${placeName} à Al Hoceima : adresse, avis, photos, services et localisation sur Google Maps. Découvrez ce lieu avec VillaMap.`;
+
+      canonicalUrl =
+        `${siteUrl}#${selectedPlaceType}-${selectedPlace.id}`;
+
+      const baseType =
+        selectedPlaceType === "hotels"
+          ? "Hotel"
+          : selectedPlaceType ===
+            "restaurants"
+          ? "Restaurant"
+          : "LocalBusiness";
+
+      structuredData = {
+        "@context":
+          "https://schema.org",
+        "@type": baseType,
+        name: placeName,
+        description,
+        url: canonicalUrl,
+        address: {
+          "@type":
+            "PostalAddress",
+          addressLocality:
+            "Al Hoceima",
+          addressCountry: "MA",
+          streetAddress:
+            selectedPlace.address ||
+            undefined,
+        },
+        image:
+          getImage(
+            selectedPlace,
+            selectedPlaceType
+          ),
+      };
+
+      if (selectedPlace.phone) {
+        structuredData.telephone =
+          selectedPlace.phone;
+      }
+
+      if (
+        selectedPlace.rating &&
+        selectedPlace.reviews
+      ) {
+        structuredData.aggregateRating =
+          {
+            "@type":
+              "AggregateRating",
+            ratingValue:
+              Number(
+                selectedPlace.rating
+              ),
+            reviewCount:
+              Number(
+                selectedPlace.reviews
+              ),
+            bestRating: 5,
+            worstRating: 1,
+          };
+      }
+    } else if (
+      selectedCategory &&
+      selectedCategory !== "all"
+    ) {
+      const categoryName =
+        getCategoryName(
+          selectedCategory
+        );
+
+      title =
+        `${categoryName} à Al Hoceima — VillaMap`;
+
+      description =
+        `Découvrez les ${categoryName.toLowerCase()} à Al Hoceima, Maroc : adresses, avis, photos, services et localisation avec VillaMap.`;
+
+      canonicalUrl =
+        `${siteUrl}#${selectedCategory}`;
+
+      structuredData = {
+        "@context":
+          "https://schema.org",
+        "@type": "CollectionPage",
+        name: title,
+        description,
+        url: canonicalUrl,
+        inLanguage: "fr-MA",
+        about: {
+          "@type":
+            "City",
+          name: "Al Hoceima",
+          addressCountry: "MA",
+        },
+      };
+    } else if (
+      search.trim()
+    ) {
+      const searchValue =
+        search.trim();
+
+      title =
+        `${searchValue} à Al Hoceima — VillaMap`;
+
+      description =
+        `Recherchez ${searchValue} à Al Hoceima avec VillaMap et découvrez les lieux, adresses, avis et informations pratiques.`;
+
+      canonicalUrl =
+        `${siteUrl}#search-${encodeURIComponent(
+          searchValue
+        )}`;
+
+      structuredData = {
+        "@context":
+          "https://schema.org",
+        "@type": "SearchResultsPage",
+        name: title,
+        description,
+        url: canonicalUrl,
+        inLanguage: "fr-MA",
+      };
     }
 
-    loadPlaces();
-  }, []);
+    document.title = title;
+
+    updateMetaTag(
+      "name",
+      "description",
+      description
+    );
+
+    updateMetaTag(
+      "name",
+      "robots",
+      showAdmin && isAdmin
+        ? "noindex, nofollow"
+        : "index, follow"
+    );
+
+    updateMetaTag(
+      "property",
+      "og:title",
+      title
+    );
+
+    updateMetaTag(
+      "property",
+      "og:description",
+      description
+    );
+
+    updateMetaTag(
+      "property",
+      "og:url",
+      canonicalUrl
+    );
+
+    updateMetaTag(
+      "property",
+      "og:image",
+      `${siteUrl}logo.png.png`
+    );
+
+    updateMetaTag(
+      "name",
+      "twitter:title",
+      title
+    );
+
+    updateMetaTag(
+      "name",
+      "twitter:description",
+      description
+    );
+
+    updateMetaTag(
+      "name",
+      "twitter:image",
+      `${siteUrl}logo.png.png`
+    );
+
+    updateCanonical(
+      canonicalUrl
+    );
+
+    updateJsonLd(
+      structuredData
+    );
+  }, [
+    selectedPlace,
+    selectedPlaceType,
+    selectedCategory,
+    search,
+    showAdmin,
+    isAdmin,
+  ]);
 
   /* =======================================================
      NAVIGATION
   ======================================================= */
 
   function goHome() {
+    setShowAdmin(false);
     setSelectedPlace(null);
     setSelectedPlaceType(null);
     setSelectedCategory(null);
     setSearch("");
-    setShowAdmin(false);
   }
 
-  function goExplorer(category = "all") {
+  function goExplorer(
+    category = "all"
+  ) {
+    setShowAdmin(false);
     setSelectedPlace(null);
     setSelectedPlaceType(null);
     setSelectedCategory(category);
   }
 
-  function openCategory(category) {
+  function openCategory(
+    category
+  ) {
     goExplorer(category);
   }
 
-  function openPlace(item, type) {
+  function openPlace(
+    item,
+    type
+  ) {
+    setShowAdmin(false);
     setSelectedPlace(item);
     setSelectedPlaceType(type);
   }
 
   function backToExplorer() {
+    setShowAdmin(false);
     setSelectedPlace(null);
     setSelectedPlaceType(null);
+
+    if (selectedCategory === null) {
+      setSelectedCategory("all");
+    }
   }
 
   function handleSearch() {
-    const value = search.trim();
-
+    setShowAdmin(false);
     setSelectedPlace(null);
     setSelectedPlaceType(null);
     setSelectedCategory("all");
     scrollTop();
   }
 
+  function openAdmin() {
+    if (!isAdmin) {
+      return;
+    }
+
+    setSelectedPlace(null);
+    setSelectedPlaceType(null);
+    setSelectedCategory(null);
+    setSearch("");
+    setShowAdmin(true);
+  }
+
   /* =======================================================
      PAGE
   ======================================================= */
 
-  
-let page;
+  let page;
 
-if (showAdmin && isAdmin) {
-  page = (
-    <AdminPage
-      placesData={placesData}
-      onPlacesUpdated={async () => {
-        const { data } = await supabase
-          .from("places")
-          .select("*")
-          .order("id", { ascending: true });
-
-        const grouped = {
-          ...emptyData,
-        };
-
-        (data || []).forEach((rawPlace) => {
-          const place = normalizePlace(rawPlace);
-
-          if (grouped[place.category]) {
-            grouped[place.category].push(place);
-          }
-        });
-
-        setPlacesData(grouped);
-      }}
-    />
-  );
-} else if (
-  selectedPlace &&
-  selectedPlaceType
-) {
+  if (
+    showAdmin &&
+    isAdmin
+  ) {
+    page = (
+      <AdminPage
+        placesData={placesData}
+        onPlacesUpdated={
+          loadPlacesFromSupabase
+        }
+        onBack={goHome}
+      />
+    );
+  } else if (
+    selectedPlace &&
+    selectedPlaceType
+  ) {
     page = (
       <DetailPage
         item={selectedPlace}
         type={selectedPlaceType}
         onBack={backToExplorer}
         user={user}
-        onAuth={() => setShowAuth(true)}
+        onAuth={() =>
+          setShowAuth(true)
+        }
       />
     );
   } else if (
@@ -2788,6 +3334,10 @@ if (showAdmin && isAdmin) {
     );
   }
 
+  /* =======================================================
+     RETURN
+  ======================================================= */
+
   return (
     <div className="app">
       <Navbar
@@ -2801,14 +3351,11 @@ if (showAdmin && isAdmin) {
         }
         onCategory={openCategory}
         user={user}
-        onAuth={() => setShowAuth(true)}
+        onAuth={() =>
+          setShowAuth(true)
+        }
         isAdmin={isAdmin}
-onAdmin={() => {
-  setSelectedPlace(null);
-  setSelectedPlaceType(null);
-  setSelectedCategory(null);
-   setShowAdmin(true);
-}}
+        onAdmin={openAdmin}
       />
 
       {loadingPlaces && (
